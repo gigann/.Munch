@@ -15,6 +15,7 @@ master_window = pygame.display.set_mode((window_width, window_height), flags=pyg
 tile_width = 64
 tile_height = 64
 
+# offset items/player/monsters 16 tiles west and 32 tiles down
 item_width = 32
 item_height = 32
 
@@ -61,20 +62,6 @@ up_staircase_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
 down_staircase = sheet.subsurface((4*tile_width, 5*tile_height, tile_width, tile_height))
 down_staircase_shade = down_staircase.copy()
 down_staircase_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-
-#floor_tile = sheet.subsurface((32*tile_width, 20*tile_height, tile_width, tile_height))
-#wall_tile = sheet.subsurface((13*tile_width, 25*tile_height, tile_width, tile_height))
-
-
-player_tile = sheet.subsurface((4*tile_width, 7*tile_height, tile_width, tile_height))
-player_tile_shade = player_tile.copy()
-player_tile_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-#player_tile = sheet.subsurface((0*tile_width, 9*tile_height, tile_width, tile_height))
-
-#fog_tile = sheet.subsurface((6*tile_width, 11*tile_height, tile_width, tile_height))
-#fog_tile = pygame.image.load('tiles/shadow.png')
 
 game_background = (16, 16, 16)
 
@@ -172,7 +159,7 @@ banana_tile_shade = banana_tile.copy()
 banana_tile_shade.fill(shade, special_flags = pygame.BLEND_RGBA_MIN)
 
 # monster sprites
-goblin_tile = sheet.subsurface((2*tile_width, 10*tile_height, tile_width, tile_height))
+goblin_tile = pygame.image.load('tiles/Dungeon Crawl Stone Soup Full/monster/goblin_new.png')
 goblin_tile = goblin_tile.convert_alpha()
 goblin_tile_shade = goblin_tile.copy()
 goblin_tile_shade.fill(shade, special_flags = pygame.BLEND_RGBA_MIN)
@@ -182,6 +169,12 @@ corpse = pygame.image.load('tiles/Dungeon Crawl Stone Soup Full/misc/blood/blood
 corpse = corpse.convert_alpha()
 corpse_shade = corpse.copy()
 corpse_shade.fill(shade, special_flags = pygame.BLEND_RGBA_MIN)
+
+# player sprites
+player_tile = pygame.image.load('tiles/Dungeon Crawl Stone Soup Full/monster/unique/chuck.png')
+player_tile = player_tile.convert_alpha()
+player_tile_shade = player_tile.copy()
+player_tile_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
 
 '''
 FONTS

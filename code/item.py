@@ -76,7 +76,7 @@ class Armor(Item):
         self.quality = quality
 
 class Weapon(Item):
-    def __init__(self, name, x, y, sprite, shadow_sprite, quantity=1, action_set=['don', 'doff'], weapon_die=6, damage_type=1, quality=Quality.MUNDANE):
+    def __init__(self, name, x, y, sprite, shadow_sprite, quantity=1, action_set=['wield', 'sheathe'], weapon_die=6, damage_type=1, quality=Quality.MUNDANE):
         self.name = name
         self.x = x
         self.y = y
@@ -84,7 +84,7 @@ class Weapon(Item):
         self.shadow_sprite = shadow_sprite
         self.quantity = quantity
         self.action_set = action_set
-        super(Armor, self).__init__(
+        super(Weapon, self).__init__(
             name=self.name,
             x=self.x,
             y=self.y,

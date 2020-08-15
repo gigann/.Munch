@@ -289,6 +289,18 @@ class Dungeon(object):
 
         return blip_player
 
+    def render_proper():
+        # 1. render floor
+        # 
+        # 
+        # 
+        # 
+        # 
+        # 
+        # 
+        # 
+        pass
+
     def render(self, surface):
 
         gc.collect()
@@ -501,15 +513,15 @@ class Dungeon(object):
                 #    ((i + j) * assets.tile_height//4)-y_offset))
 
         for i in self.current_level.item_list: # draw items
-            i.render(self, surface, x_offset=x_offset, y_offset=y_offset, fov=fov)
+            i.render(self, surface, x_offset=x_offset-16, y_offset=y_offset-28, fov=fov)
 
         for f in self.current_level.feature_list: # draw objects
             f.render(self, surface, x_offset=x_offset, y_offset=y_offset, fov=fov)
 
         for c in self.current_level.creature_list: # draw objects
-            c.render(self, surface, x_offset=x_offset, y_offset=y_offset, fov=fov)
+            c.render(self, surface, x_offset=x_offset-16, y_offset=y_offset-28, fov=fov)
 
-        self.player.render(self, surface, x_offset=x_offset, y_offset=y_offset, fov=fov)
+        self.player.render(self, surface, x_offset=x_offset-16, y_offset=y_offset-28, fov=fov)
 
         #for c in self.entity_set: # draw creatures
         #    c.render(self, surface, x_offset=x_offset, y_offset=y_offset, fov=fov)
