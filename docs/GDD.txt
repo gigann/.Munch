@@ -11,48 +11,24 @@ not very big rn just main mechanics etc
 will probably implement the stuff in the d&d folder after the main mechanics
 no/very basic animations if using bearlib
 
-CORE MECHANIC
-- food satiates player hunger that decreases every round depending on metabolism
-- every monster drops an ingredient
-- combining two different ingredients produces a unique meal
-- eating ingredients reveals their effect but may only be done depending on INT
-- unique meals produce unique effects
-- undereating results in weight loss
-- weight loss leads to weakness, starvation, and death 
-- overeating results in weight gain
-- weight gain leads to outgrowing armor pieces, slower movement, and cardiac arrest
-- recipes change each playthrough
-- eating gives exp to progress player levels
-- on level up player can increase one of their attributes by 2
-
 base attributes: 10 is average
 vitality - hitpoints 0 hitpoints kills the character
 metabolism - hunger rate 0 metabolism locks hunger rate
 strength - attack damage 0 str = 0 damage
 dexterity - armor; 0 dex locks movement
-intelligence - how many memorized ingredients you may learn; 0 int gives control to AI
+intelligence - magic stuff
 
 determined attributes: will be different depending on balancing etc...
 current/max health - if u run out u die
-current/max hunger - every round over max results in weight gain and every round under max 			     results in weight loss
+current/max hunger - for starvation
 armor - reduces incoming damage
-min/max morbidly obese - going above reduces dex by 4 and kicks in heart disease
-min/max obese - going above reduces dex by 3
-min/max overweight - going above reduces dex by 2 
-min/max normal weight - going below reduces str by 1 and going above reduces dex by 1
-min/max underweight - going blow reduces str by 2
-min/max severely underweight - going below reduce str by 3 and kicks in starvation
 
-current exp/level - gained through eating; levelups available at exp threshholds
+
+current exp/level - gained through eating bananas? levelups available at exp threshholds
 1 exp per meal
 x = exp, y = level
 
-hunger rate is stable
-metabolism is like vitality for the hunger bar but doesn't scale with level
-hunger is like health but going over is also dangerous
 
-
-OR ditch eating rules and go monkey themed
 classes:
 gorilla     big and strong, need more food, can charge attack, (large bite and two large punches, large hd, +2 str +2 vit -2 met)
 chimpanzee  start with extra bananas, nimble, can grapple attack, (bite, two claws, small hd, +2 dex), can climb back up stairs
