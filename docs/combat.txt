@@ -1,0 +1,107 @@
+game mechanics: modular component system
+
+MONSTER TYPES (for reference, look at monsters.txt)
+Undead
+Lycanthropes
+Dark Elves (all elves)
+Golems
+Giants
+Orcs
+Dwarves
+Humans
+Slimes
+Mimics
+Traps
+Dragons
+Plants
+
+weapons with multiple types have different moves for each type e.g. a zweihander can slash, stab, or mordhau-style smash while a hafted-ax can only slash
+
+armor provides damage reduction
+
+RELATED ABILITIES:
+- left handed, large melee attack and damage bonus perhaps due to unfamiliarity or something more sinister
+- ambidexterous, may wield two weapons in each hand for two attacks per round
+- butterfingers, huge penalty to all attacks
+- nearsighted, huge penalty to ranged weapon attacks
+- farsighted, huge penalty to melee weapon attacks
+- cleric, huge penalty to slashing and thrusting weapon attacks unless they are also Fire or Blessed
+
+
+WEAPON ABILITIES
+- melee, the weapon may only attack an adjacent target
+- slashing, the weapon can slash to deal slashing damage
+- bludgeoning, the weapon can strike to deal bludgeoning damage
+- thrusting, the weapon can stab to deal thrusting damage
+- reach, the melee weapon can attack twice as far away
+- trip, the weapon can trip the target for a stunning effect. Works like an attack where hit = success.
+- charge, the weapon can make a charge attack for extra damage. Must move in a straight line.
+- pounce, the weapon can make a pounce attack (extra movement).
+- disarm, the weapon can disarm the targets' weapons. Works like an attack where hit = success.
+- parry, the weapon can block the targets' attack. Roll to hit is added to defense of next incoming attack.
+- ranged, the weapon can attack from a distance within field of view
+- ammo, the weapon requires ammunition to function
+- one handed, the weapon can be wielded with a single hand
+- two handed, the weapon requires both hands
+- riposte, the weapon will automatically follow a successful parry with a counterattack.
+- feint, the first attack of the weapon is always a critical.
+
+ACTIVE DAMAGE TYPES: (each is type of attack as well as a damage type)
+slashing (Sl) weapons E.G. SLASH
+- bleed, successful hits deal additional damage over time
+- cleave, weapon hits in an arc and may hit multiple enemies at once
+- amputate, criticals may sever: (head=instant death, arm=no hand slot, leg=stunning effect)
+
+bludgeoning (Bl) weapons E.G. STRIKE
+- puncture, attack calculation ignores target' armor
+- daze, criticals stun the target
+- holy, attacks always critial the undead
+str
+thrusting (Th) weapons E.G. STAB
+- bleed
+- pierce, as puncture, but only with critials
+- backstab, attacks always critical from behind
+
+MODIFIED DAMAGE TYPES: apply to all attacks of the base weapon
+fire (Fi) weapons
+- burn, as bleed
+- holy
+- hot, attacks always critical creatures weak to fire
+
+ice (Ic) weapons
+- frostbite, as amputate
+- cold, attacks always critical creatures weak to the cold
+
+WEAPON TYPES:
+
+Weapon Examples:
+Hafted Axe (Sl)
+Mace (Bl)
+Longspear (Th)
+
+
+Longsword (Sl/Th)
+War Axe
+War Hammer (Bl/Th)
+
+
+Zweihander (Sl/Bl/Th)
+
+
+examples:
+
+(player is wielding a hafted axe and monster is attacking with slam)
+Player slashes Monster for 12 damage. Monster bleeds for 3 damage.
+Monster bashes Player for 23 damage. Monster bleeds for 3 damage. 
+ETC
+
+(player is wielding a rapier and buckler. monster is attacking with slam)
+Player readies a parry.
+Monster is parried by player. Monster takes 30 riposte damage.
+Player readies a parry.
+Monster bashes through the parry for 24 damage.
+
+(player is wielding a flaming longsword and mummy is using its slam attack)
+Player slashes mummy for 41 critical damage! Mummy burns for 12 damage!
+Mummy dies and drops 3 gold and 1 linen. 4 EXP!
+

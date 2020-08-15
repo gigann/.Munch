@@ -1,0 +1,216 @@
+LANGUAGE
+python version 3
+- pygame for graphics, pygame ui for gui, and libtcod for logic OR
+- bearlib for everything
+* I'll figure it out soon
+all english in text/json for easy translations if needed
+
+
+SCOPE
+not very big rn just main mechanics etc
+will probably implement the stuff in the d&d folder after the main mechanics
+no/very basic animations if using bearlib
+
+CORE MECHANIC
+- food satiates player hunger that decreases every round depending on metabolism
+- every monster drops an ingredient
+- combining two different ingredients produces a unique meal
+- eating ingredients reveals their effect but may only be done depending on INT
+- unique meals produce unique effects
+- undereating results in weight loss
+- weight loss leads to weakness, starvation, and death 
+- overeating results in weight gain
+- weight gain leads to outgrowing armor pieces, slower movement, and cardiac arrest
+- recipes change each playthrough
+- eating gives exp to progress player levels
+- on level up player can increase one of their attributes by 2
+
+base attributes: 10 is average
+vitality - hitpoints 0 hitpoints kills the character
+metabolism - hunger rate 0 metabolism locks hunger rate
+strength - attack damage 0 str = 0 damage
+dexterity - armor; 0 dex locks movement
+intelligence - how many memorized ingredients you may learn; 0 int gives control to AI
+
+determined attributes: will be different depending on balancing etc...
+current/max health - if u run out u die
+current/max hunger - every round over max results in weight gain and every round under max 			     results in weight loss
+armor - reduces incoming damage
+min/max morbidly obese - going above reduces dex by 4 and kicks in heart disease
+min/max obese - going above reduces dex by 3
+min/max overweight - going above reduces dex by 2 
+min/max normal weight - going below reduces str by 1 and going above reduces dex by 1
+min/max underweight - going blow reduces str by 2
+min/max severely underweight - going below reduce str by 3 and kicks in starvation
+
+current exp/level - gained through eating; levelups available at exp threshholds
+1 exp per meal
+x = exp, y = level
+
+hunger rate is stable
+metabolism is like vitality for the hunger bar but doesn't scale with level
+hunger is like health but going over is also dangerous
+
+
+OR ditch eating rules and go monkey themed
+classes:
+gorilla     big and strong, need more food, can charge attack, (large bite and two large punches, large hd, +2 str +2 vit -2 met)
+chimpanzee  start with extra bananas, nimble, can grapple attack, (bite, two claws, small hd, +2 dex), can climb back up stairs
+orangutan   chill af, can use feet like hands (bite, 2 claws 2 punches, medium hd), can climb back up stairs
+human       biggest peepee, pretends to be smart, excellent thrower, can cook food (very small bite and small two punches, small hd)
+neanderthal great vision/FOV, excellent thrower, can rake attack,  can cook food (small bite and two punches, medium hd)
+
+currency for shops is bananas but you can also eat them to fend off starvation, use them as a missile weapon, fuel a rage, make a trip trap, etc etc..
+
+features to add:
+console alerts when all monsters on level are dead
+poop button
+throw anything
+yelling
+
+REFINE:
+rendering - new order: 1. floor, 2. stairs 3. items 4. monsters 5. player 6. walls if wall overlap 2-5 then make wall translucent
+doors 
+viewport
+FOV shadows
+console
+working staircases
+gear/items
+inventory
+map
+
+TODO:
+item quantities
+monsters
+traps
+water
+lava
+money
+shops
+magic stuffs
+grafting
+(animations and sound/music can wait)
+
+when game is somewhat done replace all sprites/animations with your own stuff
+
+ANIMATIONS:
+everything has a shaded variant (go in gimp and darken with a blue tint except for the background color (16, 16, 16))
+
+creature animations: NORTH, NORTHEAST(northwest mirror), EAST(west mirror), SOUTHEAST(southwest morror), SOUTH for 5 unique sprite directions for each
+walk, descend and ascend might be separate
+attack, throw might be separate
+dodge
+take hit, die might be separate
+pick up, drop might be separate
+eat
+poo
+enter rage
+yell
+
+game mechanics: modular component system
+
+MONSTER TYPES (for reference, look at monsters.txt)
+Undead
+Lycanthropes
+Dark Elves (all elves)
+Golems
+Giants
+Orcs
+Dwarves
+Humans
+Slimes
+Mimics
+Traps
+Dragons
+Plants
+
+weapons with multiple types have different moves for each type e.g. a zweihander can slash, stab, or mordhau-style smash while a hafted-ax can only slash
+
+armor provides damage reduction
+
+RELATED ABILITIES:
+- left handed, large melee attack and damage bonus perhaps due to unfamiliarity or something more sinister
+- ambidexterous, may wield two weapons in each hand for two attacks per round
+- butterfingers, huge penalty to all attacks
+- nearsighted, huge penalty to ranged weapon attacks
+- farsighted, huge penalty to melee weapon attacks
+- cleric, huge penalty to slashing and thrusting weapon attacks unless they are also Fire or Blessed
+
+
+WEAPON ABILITIES
+- melee, the weapon may only attack an adjacent target
+- slashing, the weapon can slash to deal slashing damage
+- bludgeoning, the weapon can strike to deal bludgeoning damage
+- thrusting, the weapon can stab to deal thrusting damage
+- reach, the melee weapon can attack twice as far away
+- trip, the weapon can trip the target for a stunning effect. Works like an attack where hit = success.
+- charge, the weapon can make a charge attack for extra damage. Must move in a straight line.
+- pounce, the weapon can make a pounce attack (extra movement).
+- disarm, the weapon can disarm the targets' weapons. Works like an attack where hit = success.
+- parry, the weapon can block the targets' attack. Roll to hit is added to defense of next incoming attack.
+- ranged, the weapon can attack from a distance within field of view
+- ammo, the weapon requires ammunition to function
+- one handed, the weapon can be wielded with a single hand
+- two handed, the weapon requires both hands
+- riposte, the weapon will automatically follow a successful parry with a counterattack.
+- feint, the first attack of the weapon is always a critical.
+
+ACTIVE DAMAGE TYPES: (each is type of attack as well as a damage type)
+slashing (Sl) weapons E.G. SLASH
+- bleed, successful hits deal additional damage over time
+- cleave, weapon hits in an arc and may hit multiple enemies at once
+- amputate, criticals may sever: (head=instant death, arm=no hand slot, leg=stunning effect)
+
+bludgeoning (Bl) weapons E.G. STRIKE
+- puncture, attack calculation ignores target' armor
+- daze, criticals stun the target
+- holy, attacks always critial the undead
+str
+thrusting (Th) weapons E.G. STAB
+- bleed
+- pierce, as puncture, but only with critials
+- backstab, attacks always critical from behind
+
+MODIFIED DAMAGE TYPES: apply to all attacks of the base weapon
+fire (Fi) weapons
+- burn, as bleed
+- holy
+- hot, attacks always critical creatures weak to fire
+
+ice (Ic) weapons
+- frostbite, as amputate
+- cold, attacks always critical creatures weak to the cold
+
+WEAPON TYPES:
+
+Weapon Examples:
+Hafted Axe (Sl)
+Mace (Bl)
+Longspear (Th)
+
+
+Longsword (Sl/Th)
+War Axe
+War Hammer (Bl/Th)
+
+
+Zweihander (Sl/Bl/Th)
+
+
+examples:
+
+(player is wielding a hafted axe and monster is attacking with slam)
+Player slashes Monster for 12 damage. Monster bleeds for 3 damage.
+Monster bashes Player for 23 damage. Monster bleeds for 3 damage. 
+ETC
+
+(player is wielding a rapier and buckler. monster is attacking with slam)
+Player readies a parry.
+Monster is parried by player. Monster takes 30 riposte damage.
+Player readies a parry.
+Monster bashes through the parry for 24 damage.
+
+(player is wielding a flaming longsword and mummy is using its slam attack)
+Player slashes mummy for 41 critical damage! Mummy burns for 12 damage!
+Mummy dies and drops 3 gold and 1 linen. 4 EXP!
+

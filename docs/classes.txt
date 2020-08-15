@@ -1,0 +1,124 @@
+RULES:
+STR https://advanced-dungeons-dragons-2nd-edition.fandom.com/wiki/Strength
+Exceptional Score	New Strength Score
+18/01–18/50		19
+18/51–18/75		20
+18/76–18/90		21
+18/91–18/99		22
+18/00			23
+19–20			24
+21–22			25
+22–23			26
+24–25			27
+
+INT     http://cachelot.com/2017/05/17/the-scale-of-primate-intelligence/
+INT = IQ / 30
+
+MET https://mbwildlifeblog.wordpress.com/quantitative-energy-requirements/
+MET = kcal per day / 250
+
+VIT = (str mod + dex score + int mod)*2 + 10
+
+after everything else, adjust all the scores to make the human have 10s in everything relative to everything else
+
+hit die = weight / 16
+
+orangutan: Pongo pygmaeus (troll)
+can use feet as hands
+185 IQ
+7 times stronger than human
+5361 kcal per day
+smartest primate
+good at climbing
+1d10 HD
+11 VIT
+24 STR
+6 DEX
+7 INT
+14 MET
+
+chimpanzee: Pan troglodytes (goblin)
+nasty bite
+165 IQ
+1.5 stronger than human
+3018 kcal per day
+good at climbing
+good at grappling
+1d6 HD
+7 VIT
+12 STR
+8 DEX
+6 INT
+12 MET
+
+gorilla: Gorilla gorilla (ogre)
+150 IQ
+20x stronger than human
+good at charging
+7000 kcal/day
+1d20 HD
+9 VIT
+27 STR
+4 DEX
+5 INT
+28 MET
+
+human: Homo sapiens (human)
+300 IQ
+2500 kcal/day
+built for finesse (dex) and endurance (met)
+good at throwing
+1d10 HD
+17 VIT
+8 STR
+18 DEX
+10 INT
+10 MET
+
+neanderthal: Homo neanderthalensis (dwarf)
+250 IQ
+4,480 kcal per day
+lack finesse
+neanderthal 20% stronger than human
+excellent visual senses
+90 iq
+good at pouncing
+1d12 HD
+19 VIT
+23 STR
+14 DEX
+9 INT
+18 MET
+
+denisovan: Homo denisova (gnome)
+230 IQ
+??? not enough info so average human and neanderthal maybe?
+1d12 HD
+18 VIT
+16 STR
+16 DEX
+8 INT
+14 MET
+
+flores man: Homo floresiensis (hobbit)
+doesn't need that much food
+excellent at throwing
+good at hiding
+1d4 HD
+14 VIT
+6 STR
+18 DEX
+9 INT
+6 MET
+
+bili ape: ??? ??? (orc)
+monsterous cross between gorilla and chimpanzee
+16 HD
+8 VIT
+19 STR
+6 DEX
+5 INT
+20 MET
+
+
+
