@@ -85,21 +85,6 @@ yell
 
 game mechanics: modular component system
 
-MONSTER TYPES (for reference, look at monsters.txt)
-Undead
-Lycanthropes
-Dark Elves (all elves)
-Golems
-Giants
-Orcs
-Dwarves
-Humans
-Slimes
-Mimics
-Traps
-Dragons
-Plants
-
 weapons with multiple types have different moves for each type e.g. a zweihander can slash, stab, or mordhau-style smash while a hafted-ax can only slash
 
 armor provides damage reduction
@@ -190,3 +175,63 @@ Monster bashes through the parry for 24 damage.
 Player slashes mummy for 41 critical damage! Mummy burns for 12 damage!
 Mummy dies and drops 3 gold and 1 linen. 4 EXP!
 
+spell/scroll etc ideas:
+weapon spell
+summon allied creature
+turn creature into banana
+explode brain (brainless creatures would be immune)
+lightning (deal damage directly and channeled through water and sets oil on fire)
+enhance a weapon
+shoot a missile
+
+MONSTER TYPES (for reference, look at monsters.txt)
+Undead
+Lycanthropes
+Dark Elves (all elves)
+Golems
+Giants
+Orcs
+Dwarves
+Humans
+Slimes
+Mimics
+Traps
+Dragons
+Plants
+
+Items:
+banana - eat to gain exp and satiate, throw at a target to trip them. throw on the ground to make that tile slippery
+x vial - collect a liquid with an empty one and throw one with a particular liquid to cover an area with a hazard
+armor - different types provide damage reduction
+lantern - extend fov but requires oil as a fuel
+x boot - prevents damage from x environmental hazard
+weapons - see above but with enhanced and cursed variants. enhanced weapons 
+Environmental Hazards:
+fire - deals damage every round a creature stands in it and ten rounds thereafter
+water - slippery and puts out fire
+oil - slippery and can be set on fire
+acid - deals damage every round a creature stands in it and destroys a piece of gear. Can also dissolve items
+spikes - deals damage every round a creature stands in it 
+banana - like oil but fire destroys
+lava - mechanically, combination of acid and fire
+ice - slippery and puts out fire and also deals damage every round a creature stands in it
+
+Specific Monsters:
+goblin - easy to kill but teach positioning as they can quickly swarm a player
+kobold - like goblins but they can summon each other
+skeleton - mindless undead weak to fire but sometimes carry good weapons and armor
+mummy - a zombie with a poisonous melee attack
+zombie - an undead with lots of health
+minotaur - tanky and highly damaging equipped with good weapons
+ogre - naked big beefy boy
+troll - like an ogre but regenerates hitpoints
+orc - mid-tier stats and equipped with shoddy gear
+elf - equipped with bows 
+centaur - like elves but faster
+yellow ooze - each attack destroys a piece of gear
+green ooze - each attack poisons the player
+purple ooze - each attack
+black ooze = each attack oils
+red ooze - each attack burns
+blue ooze - each attack soaks
+pink ooze - each attack heals 
