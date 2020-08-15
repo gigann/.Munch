@@ -11,7 +11,6 @@ framerate = 60
 master_window = pygame.display.set_mode((window_width, window_height), flags=pygame.HWSURFACE | pygame.ASYNCBLIT)
 
 # ASSET STUFF
-
 tile_width = 64
 tile_height = 64
 
@@ -19,138 +18,64 @@ tile_height = 64
 item_width = 32
 item_height = 32
 
+shade = (0, 0, 50)
+
+def from_file(location):
+    tile = pygame.image.load(location)
+    tile.convert_alpha()
+    shadow_tile = tile.copy()
+    shadow_tile.fill(shade, special_flags= pygame.BLEND_RGBA_MIN)
+    return (tile, shadow_tile)
+
+def from_sheet(spritesheet, x, y):
+    tile = spritesheet.subsurface((x*tile_width, y*tile_height, tile_width, tile_height))
+    tile.convert_alpha()
+    shadow_tile = tile.copy()
+    shadow_tile.fill(shade, special_flags= pygame.BLEND_RGBA_MIN)
+    return (tile, shadow_tile)
+
+
 #sheet = pygame.image.load('tiles/nethack_tiles_32x32px_by_nevanda.png')
 sheet = pygame.image.load('tiles/rltiles-pack/64x64.png')
 sheet = sheet.convert_alpha()
 
-shade = (0, 0, 50)
-
-floor_tile = sheet.subsurface((10*tile_width, 4*tile_height, tile_width, tile_height))
-wall_tile = sheet.subsurface((2*tile_width, 3*tile_height, tile_width, tile_height))
-
-# really nice bitmasking tutorial helped a bunch!!! https://www.youtube.com/watch?v=1Sgvkfl6qGc
-
-w0_tile = sheet.subsurface((3*tile_width, 2*tile_height, tile_width, tile_height))
-w1_tile = sheet.subsurface((4*tile_width, 2*tile_height, tile_width, tile_height))
-w2_tile = sheet.subsurface((5*tile_width, 2*tile_height, tile_width, tile_height))
-w3_tile = sheet.subsurface((6*tile_width, 2*tile_height, tile_width, tile_height))
-w4_tile = sheet.subsurface((7*tile_width, 2*tile_height, tile_width, tile_height))
-w5_tile = sheet.subsurface((8*tile_width, 2*tile_height, tile_width, tile_height))
-w6_tile = sheet.subsurface((9*tile_width, 2*tile_height, tile_width, tile_height))
-w7_tile = sheet.subsurface((10*tile_width, 2*tile_height, tile_width, tile_height))
-w8_tile = sheet.subsurface((11*tile_width, 2*tile_height, tile_width, tile_height))
-w9_tile = sheet.subsurface((12*tile_width, 2*tile_height, tile_width, tile_height))
-wA_tile = sheet.subsurface((13*tile_width, 2*tile_height, tile_width, tile_height))
-wB_tile = sheet.subsurface((14*tile_width, 2*tile_height, tile_width, tile_height))
-wC_tile = sheet.subsurface((15*tile_width, 2*tile_height, tile_width, tile_height))
-wD_tile = sheet.subsurface((0*tile_width, 3*tile_height, tile_width, tile_height))
-wE_tile = sheet.subsurface((1*tile_width, 3*tile_height, tile_width, tile_height))
-wF_tile = sheet.subsurface((2*tile_width, 3*tile_height, tile_width, tile_height))
-border_tile = sheet.subsurface((0*tile_width, 0*tile_height, tile_width, tile_height))
-
-closed_door_1 = sheet.subsurface((1*tile_width, 2*tile_height, tile_width, tile_height))
-closed_door_2 = sheet.subsurface((2*tile_width, 2*tile_height, tile_width, tile_height))
-open_door_1 = sheet.subsurface((11*tile_width, 4*tile_height, tile_width, tile_height))
-open_door_2 = sheet.subsurface((12*tile_width, 4*tile_height, tile_width, tile_height))
 
 # CREATURES or features lol
 
-up_staircase = sheet.subsurface((5*tile_width, 5*tile_height, tile_width, tile_height))
-up_staircase_shade = up_staircase.copy()
-up_staircase_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
+up_staircase, up_staircase_shade = from_sheet(sheet, 5, 5)
 
-down_staircase = sheet.subsurface((4*tile_width, 5*tile_height, tile_width, tile_height))
-down_staircase_shade = down_staircase.copy()
-down_staircase_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
+down_staircase, down_staircase_shade = from_sheet(sheet, 4, 5)
 
 game_background = (16, 16, 16)
 
 # stone brick tiles
 sheet_stone = pygame.image.load('tiles/rltiles-pack/catacomb.png')
 sheet_stone = sheet_stone.convert_alpha()
-w0_stone = sheet_stone.subsurface((0*tile_width, 0*tile_height, tile_width, tile_height))
-w0_stone_shade = w0_stone.copy()
-w0_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
 
-w1_stone = sheet_stone.subsurface((1*tile_width, 0*tile_height, tile_width, tile_height))
-w1_stone_shade = w1_stone.copy()
-w1_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
+w0_stone, w0_stone_shade = from_sheet(sheet_stone, 0, 0)
+w1_stone, w1_stone_shade = from_sheet(sheet_stone, 1, 0)
+w2_stone, w2_stone_shade = from_sheet(sheet_stone, 2, 0)
+w3_stone, w3_stone_shade = from_sheet(sheet_stone, 3, 0)
+w4_stone, w4_stone_shade = from_sheet(sheet_stone, 4, 0)
+w5_stone, w5_stone_shade = from_sheet(sheet_stone, 5, 0)
+w6_stone, w6_stone_shade = from_sheet(sheet_stone, 6, 0)
+w7_stone, w7_stone_shade = from_sheet(sheet_stone, 7, 0)
+w8_stone, w8_stone_shade = from_sheet(sheet_stone, 0, 1)
+w9_stone, w9_stone_shade = from_sheet(sheet_stone, 1, 1)
+wA_stone, wA_stone_shade = from_sheet(sheet_stone, 2, 1)
+wB_stone, wB_stone_shade = from_sheet(sheet_stone, 3, 1)
+wC_stone, wC_stone_shade = from_sheet(sheet_stone, 4, 1)
+wD_stone, wD_stone_shade = from_sheet(sheet_stone, 5, 1)
+wE_stone, wE_stone_shade = from_sheet(sheet_stone, 6, 1)
+wF_stone, wF_stone_shade = from_sheet(sheet_stone, 7, 1)
 
-w2_stone = sheet_stone.subsurface((2*tile_width, 0*tile_height, tile_width, tile_height))
-w2_stone_shade = w2_stone.copy()
-w2_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
+closed_door_1_stone, closed_door_1_stone_shade = from_sheet(sheet_stone, 0, 2)
+closed_door_2_stone, closed_door_2_stone_shade = from_sheet(sheet_stone, 1, 2)
 
-w3_stone = sheet_stone.subsurface((3*tile_width, 0*tile_height, tile_width, tile_height))
-w3_stone_shade = w3_stone.copy()
-w3_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
+open_door_1_stone, open_door_1_stone_shade = from_sheet(sheet_stone, 2, 2)
+open_door_2_stone, open_door_2_stone_shade = from_sheet(sheet_stone, 3, 2)
 
-w4_stone = sheet_stone.subsurface((4*tile_width, 0*tile_height, tile_width, tile_height))
-w4_stone_shade = w4_stone.copy()
-w4_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-w5_stone = sheet_stone.subsurface((5*tile_width, 0*tile_height, tile_width, tile_height))
-w5_stone_shade = w5_stone.copy()
-w5_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-w6_stone = sheet_stone.subsurface((6*tile_width, 0*tile_height, tile_width, tile_height))
-w6_stone_shade = w6_stone.copy()
-w6_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-w7_stone = sheet_stone.subsurface((7*tile_width, 0*tile_height, tile_width, tile_height))
-w7_stone_shade = w7_stone.copy()
-w7_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-w8_stone = sheet_stone.subsurface((0*tile_width, 1*tile_height, tile_width, tile_height))
-w8_stone_shade = w8_stone.copy()
-w8_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-w9_stone = sheet_stone.subsurface((1*tile_width, 1*tile_height, tile_width, tile_height))
-w9_stone_shade = w9_stone.copy()
-w9_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-wA_stone = sheet_stone.subsurface((2*tile_width, 1*tile_height, tile_width, tile_height))
-wA_stone_shade = wA_stone.copy()
-wA_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-wB_stone = sheet_stone.subsurface((3*tile_width, 1*tile_height, tile_width, tile_height))
-wB_stone_shade = wB_stone.copy()
-wB_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-wC_stone = sheet_stone.subsurface((4*tile_width, 1*tile_height, tile_width, tile_height))
-wC_stone_shade = wC_stone.copy()
-wC_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-wD_stone = sheet_stone.subsurface((5*tile_width, 1*tile_height, tile_width, tile_height))
-wD_stone_shade = wD_stone.copy()
-wD_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-wE_stone = sheet_stone.subsurface((6*tile_width, 1*tile_height, tile_width, tile_height))
-wE_stone_shade = wE_stone.copy()
-wE_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-wF_stone = sheet_stone.subsurface((7*tile_width, 1*tile_height, tile_width, tile_height))
-wF_stone_shade = wF_stone.copy()
-wF_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-closed_door_1_stone = sheet_stone.subsurface((0*tile_width, 2*tile_height, tile_width, tile_height))
-closed_door_1_stone_shade = closed_door_1_stone.copy()
-closed_door_1_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-closed_door_2_stone = sheet_stone.subsurface((1*tile_width, 2*tile_height, tile_width, tile_height))
-closed_door_2_stone_shade = closed_door_2_stone.copy()
-closed_door_2_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-open_door_1_stone = sheet_stone.subsurface((2*tile_width, 2*tile_height, tile_width, tile_height))
-open_door_1_stone_shade = open_door_1_stone.copy()
-open_door_1_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-open_door_2_stone = sheet_stone.subsurface((3*tile_width, 2*tile_height, tile_width, tile_height))
-open_door_2_stone_shade = open_door_2_stone.copy()
-open_door_2_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
-
-floor_stone = sheet_stone.subsurface((4*tile_width, 2*tile_height, tile_width, tile_height))
-floor_stone_shade = floor_stone.copy()
-floor_stone_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
+floor_stone, floor_stone_shade = from_sheet(sheet_stone, 4, 2)
 
 # item sprites
 banana_tile = pygame.image.load('tiles/Dungeon Crawl Stone Soup Full/item/food/banana_new.png')

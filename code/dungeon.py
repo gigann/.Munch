@@ -181,7 +181,7 @@ class Level(object): #each dungeon level
                     while rand_x == room.centerx and rand_y == room.centery:
                         rand_x = random.randint(room.x+1, room.x + room.width-1)
                         rand_y = random.randint(room.y+1, room.y + room.height-1)
-                    new_monster = entity.Entity(name='Tim',race='Goblin', x=rand_x, y=rand_y,
+                    new_monster = entity.Entity(name='goblin',race='Goblin', x=rand_x, y=rand_y,
                     vitality=6, strength=4, dexterity=8, intelligence=4, hitdie=4,
                     ai='aggro',sprite=assets.goblin_tile, shadow_sprite=assets.goblin_tile_shade)
                     self.creature_list.append(new_monster)
