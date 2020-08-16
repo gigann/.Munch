@@ -108,13 +108,14 @@ WEAPON ABILITIES
 - charge, the weapon can make a charge attack for extra damage. Must move in a straight line.
 - pounce, the weapon can make a pounce attack (extra movement).
 - disarm, the weapon can disarm the targets' weapons. Works like an attack where hit = success.
-- parry, the weapon can block the targets' attack. Roll to hit is added to defense of next incoming attack.
+- parry, the weapon can reduce incoming damage. Roll to hit, but instead of damage, reduce incoming damage by the damage the block would've done.
 - ranged, the weapon can attack from a distance within field of view
 - ammo, the weapon requires ammunition to function
 - one handed, the weapon can be wielded with a single hand
 - two handed, the weapon requires both hands
 - riposte, the weapon will automatically follow a successful parry with a counterattack.
 - feint, the first attack of the weapon is always a critical.
+- throw, the weapon can be thrown to make a ranged attack
 
 ACTIVE DAMAGE TYPES: (each is type of attack as well as a damage type)
 slashing (Sl) weapons E.G. SLASH
