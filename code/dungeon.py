@@ -19,7 +19,7 @@ class Cell(object): #each tile of the map
         self.door = door # 0 = no door, 1 = door type 1, 2 = door type 2
 
 class Level(object): #each dungeon level
-    def __init__(self, width=40, height=20): # 24, 18
+    def __init__(self, width=41, height=21): # 24, 18
         self.width = width
         self.height = height
 
@@ -48,8 +48,8 @@ class Level(object): #each dungeon level
 
             room = pygame.Rect(0, 0,
                 random.randint(min_room_width, max_room_width), random.randint(min_room_height, max_room_height))
-            room.topleft = (random.randint(0, self.width - room.w),
-                random.randint(0, self.height - room.h))
+            room.topleft = (random.randint(0, self.width-1 - room.w),
+                random.randint(0, self.height-1 - room.h))
             self.room_list.append(room)
              #print('added room')
             room_count += 1
@@ -73,8 +73,8 @@ class Level(object): #each dungeon level
         #graph = tcod.SimpleGraph(cost=cost, dtype=np.int8, cardinal=1, diagonal = 0)
         for pair in itertools.combinations(self.room_list, r=2):
 
-            cost = np.ndarray((self.width, self.height), dtype=np.int8)
-            for i, j in itertools.product(range(self.width), range(self.height)):
+            cost = np.ndarray((self.width-1, self.height-1), dtype=np.int8)
+            for i, j in itertools.product(range(self.width-1), range(self.height-1)):
                 if self.cells[i][j].solid:
                     cost[i][j] = 2
                 else:
@@ -131,14 +131,25 @@ class Level(object): #each dungeon level
             self.cells[i][self.height-1].solid=True
             self.cells[i][0].solid=True
 
+            self.cells[i][self.height-2].w=15
+            self.cells[i][1].w=15
+            self.cells[i][self.height-2].solid=True
+            self.cells[i][1].solid=True
+
+
         for i in range(self.height):
             self.cells[self.width -1][i].w=15
             self.cells[0][i].w=15
             self.cells[self.width -1][i].solid=True
             self.cells[0][i].solid=True
-        
+
+            self.cells[self.width -2][i].w=15
+            self.cells[1][i].w=15
+            self.cells[self.width -2][i].solid=True
+            self.cells[1][i].solid=True
+
         # close doors
-        for i, j in itertools.product(range(self.width), range(self.height)):
+        for i, j in itertools.product(range(self.width-1), range(self.height-1)):
             if self.cells[i][j].door != 0:
                 self.cells[i][j].solid = True
         
@@ -289,17 +300,139 @@ class Dungeon(object):
 
         return blip_player
 
-    def render_proper():
-        # 1. render floor
+    def render_proper(self, surface):
+        # 1. if in FOV 2-7 and seen
+        # 2. render floor
+        # 3. render features
+        # 4. render items
+        # 5. render monsters
+        # 6. render player
+        # 7. render walls with bitwise and make wall translucent if overlap entity
+        # 8. else if REPEAT 2-7 for seen but shaded variants
         # 
         # 
-        # 
-        # 
-        # 
-        # 
-        # 
-        # 
-        pass
+        fov = self.find_fov()
+
+        x_offset = ((self.player.x - self.player.y) * assets.tile_width//2) - surface.get_width()//2 + assets.tile_width//2
+        y_offset = ((self.player.x + self.player.y) * assets.tile_height//4) - surface.get_height()//2 + assets.tile_height//4
+
+        for i, j in itertools.product(range(self.current_level.width), range(self.current_level.height)): # iterate through all cells
+            if fov[i][j] and self.current_level.cells[i][j].seen: # 1. if seen and in FOV
+                if not self.current_level.cells[i][j].solid: # 2. floor / open door
+                    if self.current_level.cells[i][j].door == 0:
+                        surface.blit(assets.floor_stone, # 2a floor
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    else:
+                        if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
+                            if (self.tile_has_entity(i-1, j-1) or self.tile_has_entity(i, j)): # hide the door
+                                if self.current_level.cells[i][j].door == 1:
+                                    surface.blit(assets.open_door_1_stone_hide, # 2b door 1
+                                    (((i - j) * assets.tile_width//2)-x_offset,
+                                    ((i + j) * assets.tile_height//4)-y_offset))
+                                elif self.current_level.cells[i][j].door == 2:
+                                    surface.blit(assets.open_door_2_stone_hide, # 2c door 2
+                                    (((i - j) * assets.tile_width//2)-x_offset,
+                                    ((i + j) * assets.tile_height//4)-y_offset))
+                            else:
+                                if self.current_level.cells[i][j].door == 1:
+                                    surface.blit(assets.open_door_1_stone, # 2b door 1
+                                    (((i - j) * assets.tile_width//2)-x_offset,
+                                    ((i + j) * assets.tile_height//4)-y_offset))
+                                elif self.current_level.cells[i][j].door == 2:
+                                    surface.blit(assets.open_door_2_stone, # 2c door 2
+                                    (((i - j) * assets.tile_width//2)-x_offset,
+                                    ((i + j) * assets.tile_height//4)-y_offset))
+
+                    feature_at_tile = self.entity_at_tile(self.current_level.feature_list, i, j)
+                    item_at_tile = self.entity_at_tile(self.current_level.item_list, i, j)
+                    creature_at_tile = self.entity_at_tile(self.current_level.creature_list, i, j)
+
+                    if feature_at_tile is not None: # 3. tile has feature
+                        surface.blit(feature_at_tile.sprite,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+
+                    if item_at_tile is not None: # 4. tile has item
+                        surface.blit(item_at_tile.sprite,
+                        (((i - j) * assets.tile_width//2)-(x_offset-16),
+                        ((i + j) * assets.tile_height//4)-(y_offset-28)))
+
+                    if creature_at_tile is not None: # 5. tile has creature
+                        surface.blit(creature_at_tile.sprite,
+                        (((i - j) * assets.tile_width//2)-(x_offset-16),
+                        ((i + j) * assets.tile_height//4)-(y_offset-28)))
+
+                else: # 6. wall / closed door
+                    if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
+                        if ((self.tile_has_entity(i-1, j-1) and self.current_level.cells[i-1][j-1].seen) or
+                        (self.tile_has_entity(i, j-1) and self.current_level.cells[i][j-1].seen) or
+                        (self.tile_has_entity(i-2, j-1) and self.current_level.cells[i-2][j-1].seen) or
+                        (self.tile_has_entity(i-1, j) and self.current_level.cells[i-1][j].seen)):
+                            # only make tiles invisible if player has seen them before
+                            self.render_wall(surface, i, j, x_offset, y_offset, shadow=False, hide=True)
+                        else: # doesn't visually block an entity
+                            self.render_wall(surface, i, j, x_offset, y_offset, shadow=False, hide=False)
+            elif self.current_level.cells[i][j].seen: 
+                if not self.current_level.cells[i][j].solid: # 2. floor / open door
+                    if self.current_level.cells[i][j].door == 0: 
+                        surface.blit(assets.floor_stone_shade, # 2a floor
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    else:
+                        if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
+                            if (self.tile_has_entity(i-1, j-1) or self.tile_has_entity(i, j)): # hide the door
+                                if self.current_level.cells[i][j].door == 1:
+                                    surface.blit(assets.open_door_1_stone_shade_hide, # 2b door 1
+                                    (((i - j) * assets.tile_width//2)-x_offset,
+                                    ((i + j) * assets.tile_height//4)-y_offset))
+                                elif self.current_level.cells[i][j].door == 2:
+                                    surface.blit(assets.open_door_2_stone_shade_hide, # 2c door 2
+                                    (((i - j) * assets.tile_width//2)-x_offset,
+                                    ((i + j) * assets.tile_height//4)-y_offset))
+                            else:
+                                if self.current_level.cells[i][j].door == 1:
+                                    surface.blit(assets.open_door_1_stone_shade, # 2b door 1
+                                    (((i - j) * assets.tile_width//2)-x_offset,
+                                    ((i + j) * assets.tile_height//4)-y_offset))
+                                elif self.current_level.cells[i][j].door == 2:
+                                    surface.blit(assets.open_door_2_stone_shade, # 2c door 2
+                                    (((i - j) * assets.tile_width//2)-x_offset,
+                                    ((i + j) * assets.tile_height//4)-y_offset))
+
+                    feature_at_tile = self.entity_at_tile(self.current_level.feature_list, i, j)
+                    item_at_tile = self.entity_at_tile(self.current_level.item_list, i, j)
+                    creature_at_tile = self.entity_at_tile(self.current_level.creature_list, i, j)
+
+                    if feature_at_tile is not None: # 3. tile has feature
+                        surface.blit(feature_at_tile.shadow_sprite,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+
+                    if item_at_tile is not None: # 4. tile has item
+                        surface.blit(item_at_tile.shadow_sprite,
+                        (((i - j) * assets.tile_width//2)-(x_offset-16),
+                        ((i + j) * assets.tile_height//4)-(y_offset-28)))
+
+                    if creature_at_tile is not None: # 5. tile has creature
+                        surface.blit(creature_at_tile.shadow_sprite,
+                        (((i - j) * assets.tile_width//2)-(x_offset-16),
+                        ((i + j) * assets.tile_height//4)-(y_offset-28)))
+
+                else: # 6. wall / closed door
+                    if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
+                        if ((self.tile_has_entity(i-1, j-1) and self.current_level.cells[i-1][j-1].seen) or
+                        (self.tile_has_entity(i, j-1) and self.current_level.cells[i][j-1].seen) or
+                        (self.tile_has_entity(i-2, j-1) and self.current_level.cells[i-2][j-1].seen) or
+                        (self.tile_has_entity(i-1, j) and self.current_level.cells[i-1][j].seen)):
+                            # only make tiles invisible if player has seen them before
+                            self.render_wall(surface, i, j, x_offset, y_offset, shadow=True, hide=True)
+                        else: # doesn't visually block an entity
+                            self.render_wall(surface, i, j, x_offset, y_offset, shadow=True, hide=False)
+            
+        surface.blit(self.player.sprite,
+        (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
+        ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
 
     def render(self, surface):
 
@@ -676,5 +809,335 @@ class Dungeon(object):
     def tile_has_creature(self, x, y):
         for creature in self.current_level.creature_list:
             if creature.x == x and creature.y == y:
+                print('found player')
                 return True
         return False
+
+    def entity_at_tile(self, entity_list, x, y):
+        for i in entity_list:
+            if i.x == x and i.y == y:
+                return i
+        return None
+
+    def tile_has_entity(self, x, y):
+        # check player first to save time
+        if self.player.x == x and self.player.y == y:
+            return True
+        for (feature, iitem, creature) in itertools.zip_longest(
+            self.current_level.feature_list,
+            self.current_level.item_list,
+            self.current_level.creature_list):
+            if feature is not None:
+                if feature.x == x and feature.y == y:
+                    print('found feature')
+                    return True
+            if iitem is not None:
+                if iitem.x == x and iitem.y == y:
+                    print('found item')
+                    return True
+            if creature is not None:
+                if creature.x == x and creature.y == y:
+                    print('found creature')
+                    return True
+        return False
+
+    def render_wall(self, surface, i, j, x_offset, y_offset, shadow, hide):
+        if not shadow:
+            if not hide:
+                if self.current_level.cells[i][j].door == 0: # wall confirmed
+                    if self.current_level.cells[i][j].w == 0:
+                        surface.blit(assets.w0_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 1:
+                        surface.blit(assets.w1_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 2:
+                        surface.blit(assets.w2_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 3:
+                        surface.blit(assets.w3_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 4:
+                        surface.blit(assets.w4_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 5:
+                        surface.blit(assets.w5_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 6:
+                        surface.blit(assets.w6_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 7:
+                        surface.blit(assets.w7_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 8:
+                        surface.blit(assets.w8_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 9:
+                        surface.blit(assets.w9_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 10:
+                        surface.blit(assets.wA_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 11:
+                        surface.blit(assets.wB_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 12:
+                        surface.blit(assets.wC_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 13:
+                        surface.blit(assets.wD_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 14:
+                        surface.blit(assets.wE_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 15:
+                        surface.blit(assets.wF_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset)) 
+                elif self.current_level.cells[i][j].door == 1:
+                    surface.blit(assets.closed_door_1_stone, # door 1
+                    (((i - j) * assets.tile_width//2)-x_offset,
+                    ((i + j) * assets.tile_height//4)-y_offset))
+                elif self.current_level.cells[i][j].door == 2:
+                    surface.blit(assets.closed_door_2_stone, # door 2
+                    (((i - j) * assets.tile_width//2)-x_offset,
+                    ((i + j) * assets.tile_height//4)-y_offset))
+            else:
+                if self.current_level.cells[i][j].door == 0: # wall confirmed
+                    if self.current_level.cells[i][j].w == 0:
+                        surface.blit(assets.w0_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 1:
+                        surface.blit(assets.w1_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 2:
+                        surface.blit(assets.w2_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 3:
+                        surface.blit(assets.w3_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 4:
+                        surface.blit(assets.w4_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 5:
+                        surface.blit(assets.w5_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 6:
+                        surface.blit(assets.w6_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 7:
+                        surface.blit(assets.w7_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 8:
+                        surface.blit(assets.w8_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 9:
+                        surface.blit(assets.w9_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 10:
+                        surface.blit(assets.wA_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 11:
+                        surface.blit(assets.wB_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 12:
+                        surface.blit(assets.wC_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 13:
+                        surface.blit(assets.wD_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 14:
+                        surface.blit(assets.wE_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 15:
+                        surface.blit(assets.wF_stone_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset)) 
+                elif self.current_level.cells[i][j].door == 1:
+                    surface.blit(assets.closed_door_1_stone_hide, # door 1
+                    (((i - j) * assets.tile_width//2)-x_offset,
+                    ((i + j) * assets.tile_height//4)-y_offset))
+                elif self.current_level.cells[i][j].door == 2:
+                    surface.blit(assets.closed_door_2_stone_hide, # door 2
+                    (((i - j) * assets.tile_width//2)-x_offset,
+                    ((i + j) * assets.tile_height//4)-y_offset))
+        else:
+            if not hide:
+                if self.current_level.cells[i][j].door == 0: # wall confirmed
+                    if self.current_level.cells[i][j].w == 0:
+                        surface.blit(assets.w0_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 1:
+                        surface.blit(assets.w1_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 2:
+                        surface.blit(assets.w2_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 3:
+                        surface.blit(assets.w3_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 4:
+                        surface.blit(assets.w4_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 5:
+                        surface.blit(assets.w5_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 6:
+                        surface.blit(assets.w6_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 7:
+                        surface.blit(assets.w7_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 8:
+                        surface.blit(assets.w8_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 9:
+                        surface.blit(assets.w9_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 10:
+                        surface.blit(assets.wA_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 11:
+                        surface.blit(assets.wB_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 12:
+                        surface.blit(assets.wC_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 13:
+                        surface.blit(assets.wD_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 14:
+                        surface.blit(assets.wE_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 15:
+                        surface.blit(assets.wF_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset)) 
+                elif self.current_level.cells[i][j].door == 1:
+                    surface.blit(assets.closed_door_1_stone_shade, # door 1
+                    (((i - j) * assets.tile_width//2)-x_offset,
+                    ((i + j) * assets.tile_height//4)-y_offset))
+                elif self.current_level.cells[i][j].door == 2:
+                    surface.blit(assets.closed_door_2_stone_shade, # door 2
+                    (((i - j) * assets.tile_width//2)-x_offset,
+                    ((i + j) * assets.tile_height//4)-y_offset))
+            else:
+                if self.current_level.cells[i][j].door == 0: # wall confirmed
+                    if self.current_level.cells[i][j].w == 0:
+                        surface.blit(assets.w0_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 1:
+                        surface.blit(assets.w1_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 2:
+                        surface.blit(assets.w2_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 3:
+                        surface.blit(assets.w3_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 4:
+                        surface.blit(assets.w4_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 5:
+                        surface.blit(assets.w5_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 6:
+                        surface.blit(assets.w6_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 7:
+                        surface.blit(assets.w7_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 8:
+                        surface.blit(assets.w8_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 9:
+                        surface.blit(assets.w9_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 10:
+                        surface.blit(assets.wA_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 11:
+                        surface.blit(assets.wB_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 12:
+                        surface.blit(assets.wC_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 13:
+                        surface.blit(assets.wD_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 14:
+                        surface.blit(assets.wE_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
+                    if self.current_level.cells[i][j].w == 15:
+                        surface.blit(assets.wF_stone_shade_hide,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset)) 
+                elif self.current_level.cells[i][j].door == 1:
+                    surface.blit(assets.closed_door_1_stone_shade_hide, # door 1
+                    (((i - j) * assets.tile_width//2)-x_offset,
+                    ((i + j) * assets.tile_height//4)-y_offset))
+                elif self.current_level.cells[i][j].door == 2:
+                    surface.blit(assets.closed_door_2_stone_shade_hide, # door 2
+                    (((i - j) * assets.tile_width//2)-x_offset,
+                    ((i + j) * assets.tile_height//4)-y_offset))
+

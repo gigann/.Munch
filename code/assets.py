@@ -19,20 +19,35 @@ item_width = 32
 item_height = 32
 
 shade = (0, 0, 50)
+hidec = (255, 255, 255, 100)
 
-def from_file(location):
+def from_file(location, hide=False):
     tile = pygame.image.load(location)
     tile.convert_alpha()
     shadow_tile = tile.copy()
     shadow_tile.fill(shade, special_flags= pygame.BLEND_RGBA_MIN)
-    return (tile, shadow_tile)
+    if not hide:
+        return (tile, shadow_tile)
+    else:
+        hide_tile = tile.copy()
+        hide_tile.fill(hidec, special_flags= pygame.BLEND_RGBA_MULT)
+        shadow_hide_tile = shadow_tile.copy()
+        shadow_hide_tile.fill(hidec, special_flags= pygame.BLEND_RGBA_MULT)
+        return (tile, shadow_tile, hide_tile, shadow_hide_tile)
 
-def from_sheet(spritesheet, x, y):
+def from_sheet(spritesheet, x, y, hide=False):
     tile = spritesheet.subsurface((x*tile_width, y*tile_height, tile_width, tile_height))
     tile.convert_alpha()
     shadow_tile = tile.copy()
     shadow_tile.fill(shade, special_flags= pygame.BLEND_RGBA_MIN)
-    return (tile, shadow_tile)
+    if not hide:
+        return (tile, shadow_tile)
+    else:
+        hide_tile = tile.copy()
+        hide_tile.fill(hidec, special_flags= pygame.BLEND_RGBA_MULT)
+        shadow_hide_tile = shadow_tile.copy()
+        shadow_hide_tile.fill(hidec, special_flags= pygame.BLEND_RGBA_MULT)
+        return (tile, shadow_tile, hide_tile, shadow_hide_tile)
 
 
 #sheet = pygame.image.load('tiles/nethack_tiles_32x32px_by_nevanda.png')
@@ -52,28 +67,27 @@ game_background = (16, 16, 16)
 sheet_stone = pygame.image.load('tiles/rltiles-pack/catacomb.png')
 sheet_stone = sheet_stone.convert_alpha()
 
-w0_stone, w0_stone_shade = from_sheet(sheet_stone, 0, 0)
-w1_stone, w1_stone_shade = from_sheet(sheet_stone, 1, 0)
-w2_stone, w2_stone_shade = from_sheet(sheet_stone, 2, 0)
-w3_stone, w3_stone_shade = from_sheet(sheet_stone, 3, 0)
-w4_stone, w4_stone_shade = from_sheet(sheet_stone, 4, 0)
-w5_stone, w5_stone_shade = from_sheet(sheet_stone, 5, 0)
-w6_stone, w6_stone_shade = from_sheet(sheet_stone, 6, 0)
-w7_stone, w7_stone_shade = from_sheet(sheet_stone, 7, 0)
-w8_stone, w8_stone_shade = from_sheet(sheet_stone, 0, 1)
-w9_stone, w9_stone_shade = from_sheet(sheet_stone, 1, 1)
-wA_stone, wA_stone_shade = from_sheet(sheet_stone, 2, 1)
-wB_stone, wB_stone_shade = from_sheet(sheet_stone, 3, 1)
-wC_stone, wC_stone_shade = from_sheet(sheet_stone, 4, 1)
-wD_stone, wD_stone_shade = from_sheet(sheet_stone, 5, 1)
-wE_stone, wE_stone_shade = from_sheet(sheet_stone, 6, 1)
-wF_stone, wF_stone_shade = from_sheet(sheet_stone, 7, 1)
+w0_stone, w0_stone_shade, w0_stone_hide, w0_stone_shade_hide = from_sheet(sheet_stone, 0, 0, True)
+w1_stone, w1_stone_shade, w1_stone_hide, w1_stone_shade_hide = from_sheet(sheet_stone, 1, 0, True)
+w2_stone, w2_stone_shade, w2_stone_hide, w2_stone_shade_hide = from_sheet(sheet_stone, 2, 0, True)
+w3_stone, w3_stone_shade, w3_stone_hide, w3_stone_shade_hide = from_sheet(sheet_stone, 3, 0, True)
+w4_stone, w4_stone_shade, w4_stone_hide, w4_stone_shade_hide = from_sheet(sheet_stone, 4, 0, True)
+w5_stone, w5_stone_shade, w5_stone_hide, w5_stone_shade_hide = from_sheet(sheet_stone, 5, 0, True)
+w6_stone, w6_stone_shade, w6_stone_hide, w6_stone_shade_hide = from_sheet(sheet_stone, 6, 0, True)
+w7_stone, w7_stone_shade, w7_stone_hide, w7_stone_shade_hide = from_sheet(sheet_stone, 7, 0, True)
+w8_stone, w8_stone_shade, w8_stone_hide, w8_stone_shade_hide = from_sheet(sheet_stone, 0, 1, True)
+w9_stone, w9_stone_shade, w9_stone_hide, w9_stone_shade_hide = from_sheet(sheet_stone, 1, 1, True)
+wA_stone, wA_stone_shade, wA_stone_hide, wA_stone_shade_hide = from_sheet(sheet_stone, 2, 1, True)
+wB_stone, wB_stone_shade, wB_stone_hide, wB_stone_shade_hide = from_sheet(sheet_stone, 3, 1, True)
+wC_stone, wC_stone_shade, wC_stone_hide, wC_stone_shade_hide = from_sheet(sheet_stone, 4, 1, True)
+wD_stone, wD_stone_shade, wD_stone_hide, wD_stone_shade_hide = from_sheet(sheet_stone, 5, 1, True)
+wE_stone, wE_stone_shade, wE_stone_hide, wE_stone_shade_hide = from_sheet(sheet_stone, 6, 1, True)
+wF_stone, wF_stone_shade, wF_stone_hide, wF_stone_shade_hide = from_sheet(sheet_stone, 7, 1, True) 
 
-closed_door_1_stone, closed_door_1_stone_shade = from_sheet(sheet_stone, 0, 2)
-closed_door_2_stone, closed_door_2_stone_shade = from_sheet(sheet_stone, 1, 2)
-
-open_door_1_stone, open_door_1_stone_shade = from_sheet(sheet_stone, 2, 2)
-open_door_2_stone, open_door_2_stone_shade = from_sheet(sheet_stone, 3, 2)
+closed_door_1_stone, closed_door_1_stone_shade, closed_door_1_stone_hide, closed_door_1_stone_shade_hide = from_sheet(sheet_stone, 0, 2, True) 
+closed_door_2_stone, closed_door_2_stone_shade, closed_door_2_stone_hide, closed_door_2_stone_shade_hide = from_sheet(sheet_stone, 1, 2, True)
+open_door_1_stone, open_door_1_stone_shade, open_door_1_stone_hide, open_door_1_stone_shade_hide = from_sheet(sheet_stone, 2, 2, True)
+open_door_2_stone, open_door_2_stone_shade, open_door_2_stone_hide, open_door_2_stone_shade_hide = from_sheet(sheet_stone, 3, 2, True)
 
 floor_stone, floor_stone_shade = from_sheet(sheet_stone, 4, 2)
 

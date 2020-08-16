@@ -117,7 +117,7 @@ def game_menu(window_width, window_height, framerate, surface):
     blip_player = new_dungeon.render_minimap(map_surface, blip_player)
 
     #blits
-    new_dungeon.render(game_surface)
+    new_dungeon.render_proper(game_surface)
     surface.blit(game_surface, (0, 0))
     surface.blit(map_surface, (window_width//2, window_height - window_height//5))
     surface.blit(player_inv_surface, (window_width - window_width//5, window_height//2))
@@ -220,7 +220,7 @@ def game_menu(window_width, window_height, framerate, surface):
             player_inv_text.out()
 
             game_surface.fill(assets.game_background)
-            new_dungeon.render(game_surface)
+            new_dungeon.render_proper(game_surface)
             blip_player = new_dungeon.render_minimap(map_surface, blip_player)
             surface.blit(game_surface, (0, 0))
             surface.blit(map_surface, (window_width//2, window_height - window_height//5))
