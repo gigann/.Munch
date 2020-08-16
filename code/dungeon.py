@@ -332,6 +332,9 @@ class Dungeon(object):
                         (((i - j) * assets.tile_width//2)-x_offset,
                         ((i + j) * assets.tile_height//4)-y_offset))
                     else:
+                        surface.blit(assets.floor_stone,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
                         if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
                             if (self.tile_has_entity(i-1, j-1) or self.tile_has_entity(i, j)): # hide the door
                                 if self.current_level.cells[i][j].door == 1:
@@ -388,6 +391,9 @@ class Dungeon(object):
                         (((i - j) * assets.tile_width//2)-x_offset,
                         ((i + j) * assets.tile_height//4)-y_offset))
                     else:
+                        surface.blit(assets.floor_stone_shade,
+                        (((i - j) * assets.tile_width//2)-x_offset,
+                        ((i + j) * assets.tile_height//4)-y_offset))
                         if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
                             if (self.tile_has_entity(i-1, j-1) or self.tile_has_entity(i, j)): # hide the door
                                 if self.current_level.cells[i][j].door == 1:
@@ -847,6 +853,9 @@ class Dungeon(object):
 
     def render_wall(self, surface, i, j, x_offset, y_offset, shadow, hide):
         if not shadow:
+            surface.blit(assets.floor_stone,
+            (((i - j) * assets.tile_width//2)-x_offset,
+            ((i + j) * assets.tile_height//4)-y_offset))
             if not hide:
                 if self.current_level.cells[i][j].door == 0: # wall confirmed
                     if self.current_level.cells[i][j].w == 0:
@@ -996,6 +1005,9 @@ class Dungeon(object):
                     (((i - j) * assets.tile_width//2)-x_offset,
                     ((i + j) * assets.tile_height//4)-y_offset))
         else:
+            surface.blit(assets.floor_stone_shade,
+            (((i - j) * assets.tile_width//2)-x_offset,
+            ((i + j) * assets.tile_height//4)-y_offset))
             if not hide:
                 if self.current_level.cells[i][j].door == 0: # wall confirmed
                     if self.current_level.cells[i][j].w == 0:
