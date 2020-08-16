@@ -82,6 +82,7 @@ Longspear (Th)
 
 Longsword (Sl/Th)
 War Axe
+Pollaxe 
 War Hammer (Bl/Th)
 
 
@@ -104,4 +105,7 @@ Monster bashes through the parry for 24 damage.
 (player is wielding a flaming longsword and mummy is using its slam attack)
 Player slashes mummy for 41 critical damage! Mummy burns for 12 damage!
 Mummy dies and drops 3 gold and 1 linen. 4 EXP!
+
+not using damage types but will implement their effects by making each weapon have unique properties.
+
 

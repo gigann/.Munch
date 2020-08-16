@@ -2,12 +2,11 @@ import enum
 
 import entity
 import menus
+import assets
 
 class Quality(enum.Enum):
     MUNDANE, ENHANCED, CURSED = range(0, 3)
 
-class Quality(enum.Enum):
-    MUNDANE, ENHANCED, CURSED = range(0, 3)
 
 # effects is a list of functions the item is capable of e.g. throw, consume, etc
 class Item(entity.Entity):
@@ -76,7 +75,10 @@ class Armor(Item):
         self.quality = quality
 
 class Weapon(Item):
-    def __init__(self, name, x, y, sprite, shadow_sprite, quantity=1, action_set=['wield', 'sheathe'], weapon_die=6, damage_type=1, quality=Quality.MUNDANE):
+    def __init__(self, name, x, y, sprite, shadow_sprite,
+    abilities,
+    quantity=1, action_set=['wield', 'sheathe'],
+    weapon_die=6, quality=Quality.MUNDANE):
         self.name = name
         self.x = x
         self.y = y
@@ -92,6 +94,10 @@ class Weapon(Item):
             shadow_sprite=self.shadow_sprite,
             quantity=quantity,
             action_set=action_set)
+        self.abilities = abilities
+
         self.weapon_die = weapon_die
         self.quality = quality
-        
+
+#hafted_axe = Weapon('hafted axe', 0, 0, assets.hafted_axe, assets.hafted_axe_shade,
+#['melee', 'slashing'])

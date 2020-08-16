@@ -809,7 +809,6 @@ class Dungeon(object):
     def tile_has_creature(self, x, y):
         for creature in self.current_level.creature_list:
             if creature.x == x and creature.y == y:
-                print('found player')
                 return True
         return False
 
@@ -829,15 +828,12 @@ class Dungeon(object):
             self.current_level.creature_list):
             if feature is not None:
                 if feature.x == x and feature.y == y:
-                    print('found feature')
                     return True
             if iitem is not None:
                 if iitem.x == x and iitem.y == y:
-                    print('found item')
                     return True
             if creature is not None:
                 if creature.x == x and creature.y == y:
-                    print('found creature')
                     return True
         return False
 

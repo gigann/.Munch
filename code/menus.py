@@ -140,8 +140,8 @@ def game_menu(window_width, window_height, framerate, surface):
         player_action = 'no action'
 
         # #print('FPS: ' + str(round(clock.get_fps(), 0)) + ', running: ' + str(running) + ', state: ' + str(game_state))        
-        dT = clock.tick(framerate)/1000.0 # fps    
-        #dT = clock.tick()/1000.0 # TESTING MAX FRAMERATE
+        #dT = clock.tick(framerate)/1000.0 # fps    
+        dT = clock.tick()/1000.0 # TESTING MAX FRAMERATE
 
         # #print('dT : ' + str(dT))
 
@@ -250,7 +250,7 @@ def game_menu(window_width, window_height, framerate, surface):
         frame_time = frame_time[-20:]
         if sum(frame_time) != 0:
             fps = len(frame_time) / sum(frame_time)
-            #print(fps)
+            print(fps)
 
 
 
