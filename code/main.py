@@ -1,3 +1,8 @@
+"""
+Issac Gann (gannmann) 2020
+
+main module initializes the game.
+"""
 import gc
 import pygame
 

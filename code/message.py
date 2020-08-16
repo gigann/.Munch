@@ -1,3 +1,9 @@
+"""
+Issac Gann (gannmann) 2020
+
+message module handles outputting strings to the screen.
+"""
+
 import pygame
 
 import assets
@@ -36,5 +42,9 @@ class TextList(object):
         self.surface.fill((0, 0, 0))
         
         for t in self.list:
-            text_surface = self.font.render(t.name, True, fgcolor, bgcolor)
-            self.surface.blit(text_surface, (self.font.get_height(), self.font.get_height()*self.list.index(t)+1))
+            if type(t) == tuple:
+                text_surface = self.font.render(t[0], True, t[1], bgcolor)
+                self.surface.blit(text_surface, (self.font.get_height(), self.font.get_height()*self.list.index(t)+1))
+            else:
+                text_surface = self.font.render(t.name, True, fgcolor, bgcolor)
+                self.surface.blit(text_surface, (self.font.get_height(), self.font.get_height()*self.list.index(t)+1))

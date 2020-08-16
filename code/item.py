@@ -1,3 +1,9 @@
+"""
+Issac Gann (gannmann) 2020
+
+item module handles item creation and types such as weapons, armor, bananas, etc...
+"""
+
 import enum
 
 import entity

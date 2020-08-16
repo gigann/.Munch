@@ -1,3 +1,9 @@
+"""
+Issac Gann (gannmann) 2020
+
+assets module imports sprites from image files and spritesheets.
+"""
+
 import pygame
 pygame.init()
 

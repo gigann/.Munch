@@ -1,3 +1,9 @@
+"""
+Issac Gann (gannmann) 2020
+
+dungeon module handles all things related to dungeon generation and rendering
+"""
+
 import gc
 import random
 import itertools
@@ -24,7 +30,7 @@ class Level(object): #each dungeon level
         self.height = height
 
         self.cells = np.ndarray((self.width, self.height), dtype=np.object) # create 2D array
-        
+
         self.room_list = []
 
         self.feature_list = []
@@ -47,9 +53,11 @@ class Level(object): #each dungeon level
         while room_count < max_rooms:
 
             room = pygame.Rect(0, 0,
-                random.randint(min_room_width, max_room_width), random.randint(min_room_height, max_room_height))
+                               random.randint(min_room_width, max_room_width),
+                               random.randint(min_room_height, max_room_height))
+
             room.topleft = (random.randint(0, self.width-1 - room.w),
-                random.randint(0, self.height-1 - room.h))
+                            random.randint(0, self.height-1 - room.h))
             self.room_list.append(room)
              #print('added room')
             room_count += 1

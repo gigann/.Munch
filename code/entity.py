@@ -1,3 +1,9 @@
+"""
+Issac Gann (gannmann) 2020
+
+entity module handles entity related objects and methods
+"""
+
 import math
 import numpy as np
 import itertools
@@ -12,7 +18,8 @@ import assets
 class Entity(object):
     def __init__(self, name='', race='', x=0, y=0, exp = 1, vitality=10,
     metabolism=10, strength=10, dexterity=10, intelligence=10, hitdie=6, weapondie=8,
-    ai='simple', sprite=None, shadow_sprite=None, inv=None):
+    ai='simple', sprite=None, shadow_sprite=None, inv=None, helm=None,
+    armor=None, boots=None, mainhand=None, offhand=None, ring1=None, ring2=None):
         self.name = name
         self.race = race
         self.x = x
@@ -31,26 +38,44 @@ class Entity(object):
 
         self.inv = inv
 
+        self.helm = helm # armor and weapon slots are single item inventories. when equipped, items are moved from inventory to this slot and vice versa.
+        self.armor = armor
+        self.boots = boots
+        self.mainhand = mainhand
+        self.offhand = offhand
+        self.ring1 = ring1
+        self.ring2 = ring2
+
         # determined attributes
         self.level = math.floor(math.log2(self.exp))+1
-        self.max_hp = (math.floor((self.vit-10)//2) + self.hd) * self.level
-        self.max_hunger = math.floor((self.met-10)//2) + self.hd
-        self.current_hp = (math.floor((self.vit-10)//2) + self.hd) * self.level
+        self.max_hp = (self.bonus(self.vit) + self.hd) * self.level
+        self.max_hunger = self.mod(self.met) + self.hd
+        self.current_hp = (self.bonus(self.vit) + self.hd) * self.level
         self.current_hunger = self.max_hunger // 2
 
-        self.attack_mod =  math.floor((self.str-10)//2)
-        self.defense_mod = math.floor((self.dex-10)//2) + 10
+        self.attack_mod = self.mod(self.str)
+        self.defense_mod = self.mod(self.dex) + 10
 
-        self.max_ingredients_known = (math.floor((self.int-10)//2)) * self.level
+        #self.max_ingredients_known = (math.floor((self.int-10)//2)) * self.level
 
     def determined_attributes(self):
         self.level = math.floor(math.log2(self.exp))+1
-        self.max_hp = (math.floor((self.vit-10)//2) + self.hd) * self.level
-        self.max_hunger = math.floor((self.met-10)//2) + self.hd
-        self.attack_mod =  math.floor((self.str-10)//2)
-        self.defense_mod = math.floor((self.dex-10)//2) + 10
-        self.max_ingredients_known = (math.floor((self.int-10)//2)) * self.level
-        
+        self.max_hp = (self.bonus(self.vit) + self.hd) * self.level
+        self.max_hunger = self.mod(self.met) + self.hd
+
+        self.attack_mod = self.mod(self.str)
+        self.defense_mod = self.mod(self.dex) + 10
+
+        #self.max_ingredients_known = (math.floor((self.int-10)//2)) * self.level
+
+    def mod(self, attribute):
+        return math.floor((attribute-10)//2)
+
+    def bonus(self, attribute):
+        if attribute <= 10:
+            return 0
+        else:
+            return math.floor((attribute-10)//2)
 
     def render(self, dungeon, surface, x_offset, y_offset, fov):
         # conditions to show at half opacity:
@@ -125,7 +150,7 @@ class Entity(object):
                 ret_val += ' & exploded'
                 damage_roll += random.randint(1, self.wd)
                 damage_bonus += 1
-            total_damage = 2 * (damage_roll + (self.attack_mod * damage_bonus))
+            total_damage = 2 * (damage_roll + (self.bonus(self.str) * damage_bonus))
             target.current_hp -= total_damage
             ret_val += ' ' + target.name + ' for ' + str(total_damage)
             if target.current_hp <= 0:
@@ -143,7 +168,7 @@ class Entity(object):
                     ret_val += ' & exploded'
                     damage_roll += random.randint(1, self.wd)
                     damage_bonus += 1
-                total_damage = damage_roll + (self.attack_mod * damage_bonus)
+                total_damage = damage_roll + (self.bonus(self.str) * damage_bonus)
                 target.current_hp -= total_damage
                 ret_val += ' ' + target.name + ' for ' + str(total_damage)
                 if target.current_hp <= 0:
@@ -229,3 +254,51 @@ class Entity(object):
             return 'dropped ' + dropped_item.name
         else:
             return 'no action'
+
+    def get_info(self):
+        ret_val = []
+        ret_val.append((str(self.name) + ' the ' + str(self.race), (255, 255, 255)))
+        ret_val.append(('Health: ' + str(self.current_hp) + '/' + str(self.max_hp), (255, 255, 255)))
+        ret_val.append(('Hunger: ' + str(self.current_hunger) + '/' + str(self.max_hunger), (255, 255, 255)))
+
+        ret_val.append(('STR: ' + str(self.str), (255, 255, 255)))
+        ret_val.append(('DEX: ' + str(self.dex), (255, 255, 255)))
+        ret_val.append(('VIT: ' + str(self.vit), (255, 255, 255)))     
+        ret_val.append(('INT: ' + str(self.int), (255, 255, 255)))
+
+        if self.mainhand is not None:
+            ret_val.append(('mainhand: ' + self.mainhand.name, (255, 255, 255)))
+        else:
+            ret_val.append(('mainhand: fist', (255, 255, 255)))
+
+        if self.offhand is not None:
+            ret_val.append(('offhand: ' + self.offhand.name, (255, 255, 255)))
+        else:
+            ret_val.append(('offhand: fist', (255, 255, 255)))
+
+        if self.helm is not None:
+            ret_val.append(('helm: ' + self.helm.name, (255, 255, 255)))
+        else:
+            ret_val.append(('helm: empty', (255, 255, 255)))
+
+        if self.armor is not None:
+            ret_val.append(('armor: ' + self.armor.name, (255, 255, 255)))
+        else:
+            ret_val.append(('armor: empty', (255, 255, 255)))
+
+        if self.boots is not None:
+            ret_val.append(('boots: ' + self.boots.name, (255, 255, 255)))
+        else:
+            ret_val.append(('boots: empty', (255, 255, 255)))
+
+        if self.ring1 is not None:
+            ret_val.append(('L ring: ' + self.ring1.name, (255, 255, 255)))
+        else:
+            ret_val.append(('L ring: none', (255, 255, 255)))
+
+        if self.ring2 is not None:
+            ret_val.append(('R ring: ' + self.ring2.name, (255, 255, 255)))
+        else:
+            ret_val.append(('R ring: none', (255, 255, 255)))
+
+        return ret_val

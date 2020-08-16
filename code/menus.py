@@ -1,3 +1,9 @@
+"""
+Issac Gann (gannmann) 2020
+
+menus module handles game states between menus e.g. main menu and game menu
+"""
+
 import time
 
 import pygame_gui
@@ -5,12 +11,23 @@ import pygame
 
 import dungeon
 import assets
-import entity
+#import entity
 import message
 
 pygame.init()
 
 def main_menu(window_width, window_height, framerate, surface):
+    """handles all logic concerning the main menu state of the game
+
+    Args:
+        window_width ([integer]): [width of the window in pixels]
+        window_height ([integer]): [height of the window in pixels]
+        framerate ([integer]): [framerate to lock the game at]
+        surface ([pygame.Surface]): [A pygame surface that can be blitted to]
+
+    Returns:
+        [type]: [description]
+    """
     game_state = 'main menu'
 
     surface.fill((0, 0, 0))
@@ -22,11 +39,32 @@ def main_menu(window_width, window_height, framerate, surface):
     # gui elements
     button_size = (200, 50)
 
-    load_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(((-(button_size[0]//2) + window_width//2), window_height//2), button_size), text='Load Save',manager=gui)
-    new_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(((-(button_size[0]//2) + window_width//2), button_size[1] + window_height//2), button_size), text='New Game',manager=gui)
-    settings_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(((-(button_size[0]//2) + window_width//2), 2*button_size[1] + window_height//2), button_size), text='Settings',manager=gui)
-    morgue_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(((-(button_size[0]//2) + window_width//2), 3*button_size[1] + window_height//2), button_size), text='Morgue',manager=gui)
-    quit_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(((-(button_size[0]//2) + window_width//2), 4*button_size[1] + window_height//2), button_size), text='Quit',manager=gui)
+    load_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect(((
+            -(button_size[0]//2) + window_width//2), window_height//2),
+                                  button_size),
+        text='Load Save', manager=gui)
+    new_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect(((
+            -(button_size[0]//2) + window_width//2), button_size[1] + window_height//2),
+                                  button_size),
+        text='New Game', manager=gui)
+
+    settings_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect(((
+            -(button_size[0]//2) + window_width//2), 2*button_size[1] + window_height//2),
+                                  button_size),
+        text='Settings', manager=gui)
+    morgue_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect(((
+            -(button_size[0]//2) + window_width//2), 3*button_size[1] + window_height//2),
+                                  button_size),
+        text='Morgue', manager=gui)
+    quit_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect(((
+            -(button_size[0]//2) + window_width//2), 4*button_size[1] + window_height//2),
+                                  button_size),
+        text='Quit', manager=gui)
 
     running = True
     while running:
@@ -106,6 +144,10 @@ def game_menu(window_width, window_height, framerate, surface):
     console_surface = pygame.Surface((window_width//2, window_height//5))
     console = message.Message(console_surface, 5, assets.body_font)
 
+    player_info_surface = pygame.Surface((window_width//5, window_height//2))
+    player_info = new_dungeon.player.get_info()
+    player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
+
     player_inv_surface = pygame.Surface((window_width//5, window_height//2))
     player_inv_text = message.TextList(player_inv_surface, new_dungeon.player.inv, assets.body_font)
 
@@ -117,9 +159,12 @@ def game_menu(window_width, window_height, framerate, surface):
     blip_player = new_dungeon.render_minimap(map_surface, blip_player)
 
     #blits
+    player_info_text.out()
+
     new_dungeon.render_proper(game_surface)
     surface.blit(game_surface, (0, 0))
     surface.blit(map_surface, (window_width//2, window_height - window_height//5))
+    surface.blit(player_info_surface, (window_width - window_width//5, 16))
     surface.blit(player_inv_surface, (window_width - window_width//5, window_height//2))
     surface.blit(console_surface, (0, window_height - window_height//5))
     # menu render
@@ -217,6 +262,10 @@ def game_menu(window_width, window_height, framerate, surface):
             #'''
 
             # inv list
+            player_info = new_dungeon.player.get_info()
+            player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
+            player_info_text.out()
+
             player_inv_text.out()
 
             game_surface.fill(assets.game_background)
@@ -224,6 +273,7 @@ def game_menu(window_width, window_height, framerate, surface):
             blip_player = new_dungeon.render_minimap(map_surface, blip_player)
             surface.blit(game_surface, (0, 0))
             surface.blit(map_surface, (window_width//2, window_height - window_height//5))
+            surface.blit(player_info_surface, (window_width - window_width//5, 16))
             surface.blit(player_inv_surface, (window_width - window_width//5, window_height//2))
             surface.blit(console_surface, (0, window_height - window_height//5))
             pygame.display.update()
@@ -250,7 +300,7 @@ def game_menu(window_width, window_height, framerate, surface):
         frame_time = frame_time[-20:]
         if sum(frame_time) != 0:
             fps = len(frame_time) / sum(frame_time)
-            print(fps)
+            #print(fps)
 
 
 
