@@ -38,6 +38,8 @@ class Entity(object):
 
         self.inv = inv
 
+        self.bananas = 0
+
         self.helm = helm # armor and weapon slots are single item inventories. when equipped, items are moved from inventory to this slot and vice versa.
         self.armor = armor
         self.boots = boots
@@ -47,7 +49,8 @@ class Entity(object):
         self.ring2 = ring2
 
         # determined attributes
-        self.level = math.floor(math.log2(self.exp))+1
+        self.level = (math.floor(math.log2(self.exp))+1)
+
         self.max_hp = (self.bonus(self.vit) + self.hd) * self.level
         self.max_hunger = self.mod(self.met) + self.hd
         self.current_hp = (self.bonus(self.vit) + self.hd) * self.level
@@ -257,15 +260,18 @@ class Entity(object):
 
     def get_info(self):
         ret_val = []
-        ret_val.append((str(self.name) + ' the ' + str(self.race), (255, 255, 255)))
-        ret_val.append(('Health: ' + str(self.current_hp) + '/' + str(self.max_hp), (255, 255, 255)))
-        ret_val.append(('Hunger: ' + str(self.current_hunger) + '/' + str(self.max_hunger), (255, 255, 255)))
+        #ret_val.append((str(self.name) + ' the ' + str(self.race), (255, 255, 255)))
+        ret_val.append(('LVL: ' + str(self.level), (255, 255, 255)))
+        ret_val.append(('HP: ' + str(self.current_hp) + '/' + str(self.max_hp), (255, 0, 0)))
+        ret_val.append(('Hunger: ' + str(self.current_hunger) + '/' + str(self.max_hunger), (255, 128, 0)))
+        ret_val.append(('Bananas: ' + str(self.bananas), (255, 255, 0)))
 
         ret_val.append(('STR: ' + str(self.str), (255, 255, 255)))
         ret_val.append(('DEX: ' + str(self.dex), (255, 255, 255)))
         ret_val.append(('VIT: ' + str(self.vit), (255, 255, 255)))     
         ret_val.append(('INT: ' + str(self.int), (255, 255, 255)))
 
+        '''
         if self.mainhand is not None:
             ret_val.append(('mainhand: ' + self.mainhand.name, (255, 255, 255)))
         else:
@@ -300,5 +306,6 @@ class Entity(object):
             ret_val.append(('R ring: ' + self.ring2.name, (255, 255, 255)))
         else:
             ret_val.append(('R ring: none', (255, 255, 255)))
-
+        '''
         return ret_val
+        
