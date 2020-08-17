@@ -203,10 +203,12 @@ Plants
 Items:
 banana - eat to gain exp and satiate, throw at a target to trip them. throw on the ground to make that tile slippery
 x vial - collect a liquid with an empty one and throw one with a particular liquid to cover an area with a hazard
-armor - different types provide damage reduction
+helm/armor - different types provide damage reduction
 lantern - extend fov but requires oil as a fuel
 x boot - prevents damage from x environmental hazard
-weapons - see above but with enhanced and cursed variants. enhanced weapons 
+weapons - see above but with enhanced and cursed variants. enhanced weapons
+
+
 Environmental Hazards:
 fire - deals damage every round a creature stands in it and ten rounds thereafter
 water - slippery and puts out fire

@@ -108,4 +108,8 @@ Mummy dies and drops 3 gold and 1 linen. 4 EXP!
 
 not using damage types but will implement their effects by making each weapon have unique properties.
 
+rings:
+
+
+
 

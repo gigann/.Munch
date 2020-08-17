@@ -98,28 +98,16 @@ open_door_2_stone, open_door_2_stone_shade, open_door_2_stone_hide, open_door_2_
 floor_stone, floor_stone_shade = from_sheet(sheet_stone, 4, 2)
 
 # item sprites
-banana_tile = pygame.image.load('tiles/Dungeon Crawl Stone Soup Full/item/food/banana_new.png')
-banana_tile = banana_tile.convert_alpha()
-banana_tile_shade = banana_tile.copy()
-banana_tile_shade.fill(shade, special_flags = pygame.BLEND_RGBA_MIN)
+banana_tile, banana_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/item/food/banana_new.png')
 
 # monster sprites
-goblin_tile = pygame.image.load('tiles/Dungeon Crawl Stone Soup Full/monster/goblin_new.png')
-goblin_tile = goblin_tile.convert_alpha()
-goblin_tile_shade = goblin_tile.copy()
-goblin_tile_shade.fill(shade, special_flags = pygame.BLEND_RGBA_MIN)
+goblin_tile, goblin_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/monster/goblin_new.png')
 
 # corpse sprites
-corpse = pygame.image.load('tiles/Dungeon Crawl Stone Soup Full/misc/blood/blood_puddle_red.png')
-corpse = corpse.convert_alpha()
-corpse_shade = corpse.copy()
-corpse_shade.fill(shade, special_flags = pygame.BLEND_RGBA_MIN)
+corpse, corpse_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/misc/blood/blood_puddle_red.png')
 
 # player sprites
-player_tile = pygame.image.load('tiles/Dungeon Crawl Stone Soup Full/monster/unique/chuck.png')
-player_tile = player_tile.convert_alpha()
-player_tile_shade = player_tile.copy()
-player_tile_shade.fill(shade, special_flags=pygame.BLEND_RGBA_MIN)
+player_tile, player_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/monster/unique/chuck.png')
 
 '''
 FONTS
@@ -151,3 +139,16 @@ entity_color = (255, 0, 0)
 entity_color_dark = (204, 0, 0)
 
 
+# weapon sprites
+battle_ax, battle_ax_shade = from_file(
+    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/broad_axe_1.png')
+tomahawk, tomahawk_shade = from_file(
+    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/war_axe_1.png')
+cleaver, cleaver_shade = from_file(
+    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/hand_axe_2_new.png')
+halberd, halberd_shade = from_file(
+    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/halberd_1.png')
+pollaxe, pollaxe_shade = from_file(
+    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/war_axe_1.png')
+dane_axe, dane_axe_shade = from_file(
+    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/executioner_axe.png')
