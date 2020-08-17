@@ -19,7 +19,9 @@ class Entity(object):
     def __init__(self, name='', race='', x=0, y=0, exp = 1, vitality=10,
     metabolism=10, strength=10, dexterity=10, intelligence=10, hitdie=6, weapondie=8,
     ai='simple', sprite=None, shadow_sprite=None, inv=None, helm=None,
-    armor=None, boots=None, mainhand=None, offhand=None, ring1=None, ring2=None):
+    armor=None, boots=None, mainhand=None, offhand=None, ring1=None, ring2=None,
+    sword_skill=0, axe_skill=0, spear_skill=0, club_skill=0,
+    bow_skill=0, throw_skill=0, defense_skill = 0, total_armor = 0):
         self.name = name
         self.race = race
         self.x = x
@@ -48,6 +50,14 @@ class Entity(object):
         self.ring1 = ring1
         self.ring2 = ring2
 
+        self.sword_skill = sword_skill
+        self.axe_skill = axe_skill
+        self.spear_skill = spear_skill
+        self.club_skill = club_skill
+        self.bow_skill = bow_skill
+        self.throw_skill = throw_skill
+        self.defense_skill = defense_skill
+
         # determined attributes
         self.level = (math.floor(math.log2(self.exp))+1)
 
@@ -60,6 +70,7 @@ class Entity(object):
         self.defense_mod = self.mod(self.dex) + 10
 
         #self.max_ingredients_known = (math.floor((self.int-10)//2)) * self.level
+        self.total_armor = total_armor
 
     def determined_attributes(self):
         self.level = math.floor(math.log2(self.exp))+1
@@ -108,10 +119,10 @@ class Entity(object):
                         (((self.x - self.y) * assets.tile_width//2)-x_offset,
                         ((self.x + self.y) * assets.tile_height//4)-y_offset))
     
-    def dynamic_render(self, surface):
-        surface.blit(self.sprite,
-            (((self.x - self.y) * assets.tile_width//2),
-            ((self.x + self.y) * assets.tile_height//4)))
+    #def dynamic_render(self, surface):
+    #    surface.blit(self.sprite,
+    #        (((self.x - self.y) * assets.tile_width//2),
+    #        ((self.x + self.y) * assets.tile_height//4)))
 
     def move(self, dungeon, x, y):
         if self.name == dungeon.player.name:
@@ -121,7 +132,8 @@ class Entity(object):
                 # potentially attack
                 for creature in dungeon.current_level.creature_list:
                     if self.x + x == creature.x and self.y + y == creature.y:
-                        return self.attack(creature, dungeon)
+                        #return self.attack(creature, dungeon)
+                        return self.weapon_attack(creature, dungeon)
                 # if this is reached player hasn't attacked
                 self.x += x
                 self.y += y
@@ -135,7 +147,8 @@ class Entity(object):
                 return 'no action'
         else: # AI MOVEMENT
             if x == dungeon.player.x and y == dungeon.player.y:
-                return self.attack(dungeon.player, dungeon)
+                #return self.attack(dungeon.player, dungeon)
+                return self.weapon_attack(dungeon.player, dungeon)
             self.x = x
             self.y = y
             return 'boring'
@@ -183,6 +196,92 @@ class Entity(object):
 
         return ret_val
         
+    def weapon_attack(self, target, dungeon): # will replace default attack eventually
+        ret_val = self.name
+        attack_roll = self.get_attack_roll()
+
+        if attack_roll >= random.randint(1, target.dex + target.defense_skill):
+            for dice in self.mainhand.weapon_com.ddie_count:
+                damage_roll += random.randint(1, self.mainhand.weapon_com.ddie_size)
+
+            # critical  
+            if random.randint(1, self.mainhand.weapon_com.cdie) == self.mainhand.weapon_com.cdie:
+                damage_roll *= self.mainhand.weapon_com.cmult
+                ret_val += (' crit ' + target.name)
+            else: # normal hit
+                ret_val += (' hit ' + target.name)
+            # add STR
+            damage_roll += self.str
+
+            # weapon abilities here
+            damage_roll -= target.total_armor
+
+            # target has shield
+            if target.offhand.weapon_com.parry:
+                if target.attack_roll(hand='offhand') >= attack_roll:
+                    for dice in target.offhand.weapon_com.ddie_count:
+                        shield_roll += random.randint(1, target.offhand.weapon_com.ddie_size)
+                    shield_roll += target.str
+                    if damage_roll - shield_roll < 0:
+                        damage_roll = 0
+                        ret_val += (target.name + ' blocked!')
+                    else:
+                        damage_roll -= shield_roll
+                        ret_val += (target.name + ' parried ' + shield_roll)
+        else: # miss
+            damage_roll = 0
+            ret_val += (' missed ' + target.name)
+            if target.mainhand.weapon_com.riposte:
+                ret_val += (target.name + ' riposte!')
+                if target.attack_roll() >= attack_roll:
+                    new_target = self
+                    target.weapon_attack(new_target)
+
+        # subtract from health
+        if damage_roll > 0:
+            target.current_hp -= damage_roll
+            ret_val += ('for ' + str(damage_roll) + ' damage')
+
+        if target.current_hp <= 0:
+            target.die(dungeon)
+
+        return ret_val
+
+    def get_attack_roll(self, hand='mainhand'):
+        if hand=='mainhand':
+            if self.mainhand != None:
+                if self.mainhand.weapon_com.skill == 'sword':
+                    attack_roll = random.randint(1, self.dex + self.sword_skill)
+                elif self.mainhand.weapon_com.skill == 'axe':
+                    attack_roll = random.randint(1, self.dex + self.axe_skill)
+                elif self.mainhand.weapon_com.skill == 'spear':
+                    attack_roll = random.randint(1, self.dex + self.spear_skill)
+                elif self.mainhand.weapon_com.skill == 'club':
+                    attack_roll = random.randint(1, self.dex + self.club_skill)
+                elif self.mainhand.weapon_com.skill == 'bow':
+                    attack_roll = random.randint(1, self.dex + self.bow_skill)
+                elif self.mainhand.weapon_com.skill == 'throw':
+                    attack_roll = random.randint(1, self.dex + self.throw_skill)                                
+            else: # unarmed
+                attack_roll = random.randint(1, self.dex)
+        else:
+            if self.offhand != None:
+                if self.offhand.weapon_com.skill == 'sword':
+                    attack_roll = random.randint(1, self.dex + self.sword_skill)
+                elif self.offhand.weapon_com.skill == 'axe':
+                    attack_roll = random.randint(1, self.dex + self.axe_skill)
+                elif self.offhand.weapon_com.skill == 'spear':
+                    attack_roll = random.randint(1, self.dex + self.spear_skill)
+                elif self.offhand.weapon_com.skill == 'club':
+                    attack_roll = random.randint(1, self.dex + self.club_skill)
+                elif self.offhand.weapon_com.skill == 'bow':
+                    attack_roll = random.randint(1, self.dex + self.bow_skill)
+                elif self.offhand.weapon_com.skill == 'throw':
+                    attack_roll = random.randint(1, self.dex + self.throw_skill)                                
+            else: # unarmed
+                attack_roll = random.randint(1, self.dex)    
+        
+        return attack_roll
 
     def die(self, dungeon):
         import item
