@@ -408,3 +408,22 @@ class Entity(object):
         '''
         return ret_val
         
+
+    def wield(self, dungeon):
+        for i in dungeon.current_level.item_list:
+            if self.x == i.x and self.y == i.y:
+                dungeon.current_level.item_list.remove(i)
+                self.inv.append(i)
+                return 'picked up ' + i.name
+
+        return 'no action'
+
+    def sheathe(self, dungeon):
+        if len(self.inv) > 0:
+            dropped_item = self.inv.pop()
+            dropped_item.x = self.x
+            dropped_item.y = self.y
+            dungeon.current_level.item_list.append(dropped_item)
+            return 'dropped ' + dropped_item.name
+        else:
+            return 'no action'

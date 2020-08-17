@@ -140,7 +140,7 @@ entity_color_dark = (204, 0, 0)
 
 
 # weapon sprites
-battle_ax, battle_ax_shade = from_file(
+battleax, battleax_shade = from_file(
     'tiles/Dungeon Crawl Stone Soup Full/item/weapon/broad_axe_1.png')
 tomahawk, tomahawk_shade = from_file(
     'tiles/Dungeon Crawl Stone Soup Full/item/weapon/war_axe_1.png')

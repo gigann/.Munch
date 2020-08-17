@@ -16,6 +16,7 @@ import tcod
 import assets
 import entity
 import item
+import weapon
 
 class Cell(object): #each tile of the map
     def __init__(self, seen=False, solid=True, w=0, door=0):
@@ -188,6 +189,10 @@ class Level(object): #each dungeon level
                 action_set=['eat', 'throw'])
                 self.item_list.append(new_item)
         
+        new_weapon = item.Item(name='battle axe', x=self.room_list[0].centerx,  y=self.room_list[0].centery,
+        sprite=assets.battleax, shadow_sprite = assets.battleax_shade, quantity=1, action_set=['wield', 'sheathe'],
+        weapon_com=weapon.battleax)
+        self.item_list.append(new_weapon)
         # traps
 
 
