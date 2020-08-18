@@ -31,8 +31,6 @@ class Item(entity.Entity):
             shadow_sprite=self.shadow_sprite)
         self.quantity = quantity
         self.action_set = action_set
-        action_set.append('pickup')
-        action_set.append('drop')
         self.selected = selected
 
         # components. should probably change item's inheritance from entity to keep it consistent
@@ -68,5 +66,12 @@ class Item(entity.Entity):
             return 'no action'
     
 
-
-
+def banana():
+    import weapon
+    i = Item(name='banana',
+            x=0, y=0,
+            sprite=assets.banana_tile,
+            shadow_sprite=assets.banana_tile_shade,
+            quantity=1,
+            action_set=['eat', 'throw'], weapon_com=weapon.banana)
+    return i

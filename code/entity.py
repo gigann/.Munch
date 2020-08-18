@@ -20,9 +20,9 @@ import assets
 class Entity(object):
     def __init__(self, name='', race='', x=0, y=0, exp = 1, vitality=10,
     metabolism=10, strength=10, dexterity=10, intelligence=10, hitdie=6, weapondie=8,
-    ai='simple', sprite=None, shadow_sprite=None, inv=None, helm=None,
+    ai='simple', sprite=None, shadow_sprite=None, inv=None, corpse=None, helm=None,
     armor=None, boots=None, mainhand=None, offhand=None, ring1=None, ring2=None,
-    sword_skill=0, axe_skill=0, spear_skill=0, club_skill=0,
+    sword_skill=0, axe_skill=0, spear_skill=0, club_skill=0, unarmed_skill = 0,
     bow_skill=0, throw_skill=0, defense_skill = 0, total_armor = 0):
         self.name = name
         self.race = race
@@ -39,7 +39,7 @@ class Entity(object):
         self.ai = ai
         self.sprite = sprite
         self.shadow_sprite = shadow_sprite
-
+        self.corpse = corpse
         self.inv = inv
 
         self.bananas = 0
@@ -56,6 +56,7 @@ class Entity(object):
         self.axe_skill = axe_skill
         self.spear_skill = spear_skill
         self.club_skill = club_skill
+        self.unarmed_skill = unarmed_skill
         self.bow_skill = bow_skill
         self.throw_skill = throw_skill
         self.defense_skill = defense_skill
@@ -63,9 +64,12 @@ class Entity(object):
         # determined attributes
         self.level = (math.floor(math.log2(self.exp))+1)
 
-        self.max_hp = (self.bonus(self.vit) + self.hd) * self.level
+        #self.max_hp = (self.bonus(self.vit) + self.hd) * self.level
+        self.max_hp = (self.vit + self.hd) * self.level
+        self.current_hp = (self.vit + self.hd) * self.level
+
         self.max_hunger = self.mod(self.met) + self.hd
-        self.current_hp = (self.bonus(self.vit) + self.hd) * self.level
+        #self.current_hp = (self.bonus(self.vit) + self.hd) * self.level
         self.current_hunger = self.max_hunger // 2
 
         self.attack_mod = self.mod(self.str)
@@ -76,7 +80,7 @@ class Entity(object):
 
     def determined_attributes(self):
         self.level = math.floor(math.log2(self.exp))+1
-        self.max_hp = (self.bonus(self.vit) + self.hd) * self.level
+        self.max_hp = (self.vit + self.hd) * self.level
         self.max_hunger = self.mod(self.met) + self.hd
 
         self.attack_mod = self.mod(self.str)
@@ -134,8 +138,8 @@ class Entity(object):
                 # potentially attack
                 for creature in dungeon.current_level.creature_list:
                     if self.x + x == creature.x and self.y + y == creature.y:
-                        return self.attack(creature, dungeon)
-                        #return self.weapon_attack(creature, dungeon)
+                        #return self.attack(creature, dungeon)
+                        return self.weapon_attack(creature, dungeon)
                 # if this is reached player hasn't attacked
                 self.x += x
                 self.y += y
@@ -149,8 +153,8 @@ class Entity(object):
                 return 'no action'
         else: # AI MOVEMENT
             if x == dungeon.player.x and y == dungeon.player.y:
-                return self.attack(dungeon.player, dungeon)
-                #return self.weapon_attack(dungeon.player, dungeon)
+                #return self.attack(dungeon.player, dungeon)
+                return self.weapon_attack(dungeon.player, dungeon)
             self.x = x
             self.y = y
             return 'boring'
@@ -199,11 +203,24 @@ class Entity(object):
         return ret_val
         
     def weapon_attack(self, target, dungeon): # will replace default attack eventually
+        damage_roll = 0
+
+        from weapon import fist
+        if self.mainhand == None:
+            self.mainhand = fist
+        if self.offhand == None:
+            self.offhand = fist
+        if target.mainhand == None:
+            target.mainhand = fist
+        if target.offhand == None:
+            target.offhand = fist
+
+
         ret_val = self.name
         attack_roll = self.get_attack_roll()
 
         if attack_roll >= random.randint(1, target.dex + target.defense_skill):
-            for dice in self.mainhand.weapon_com.ddie_count:
+            for dice in range(self.mainhand.weapon_com.ddie_count):
                 damage_roll += random.randint(1, self.mainhand.weapon_com.ddie_size)
 
             # critical  
@@ -242,7 +259,7 @@ class Entity(object):
         # subtract from health
         if damage_roll > 0:
             target.current_hp -= damage_roll
-            ret_val += ('for ' + str(damage_roll) + ' damage')
+            ret_val += (' for ' + str(damage_roll) + ' damage')
 
         if target.current_hp <= 0:
             target.die(dungeon)
@@ -263,9 +280,9 @@ class Entity(object):
                 elif self.mainhand.weapon_com.skill == 'bow':
                     attack_roll = random.randint(1, self.dex + self.bow_skill)
                 elif self.mainhand.weapon_com.skill == 'throw':
-                    attack_roll = random.randint(1, self.dex + self.throw_skill)                                
-            else: # unarmed
-                attack_roll = random.randint(1, self.dex)
+                    attack_roll = random.randint(1, self.dex + self.throw_skill)
+                elif self.mainhand.weapon_com.skill == 'unarmed':
+                    attack_roll = random.randint(1, self.dex + self.unarmed_skill)                           
         else:
             if self.offhand != None:
                 if self.offhand.weapon_com.skill == 'sword':
@@ -280,24 +297,19 @@ class Entity(object):
                     attack_roll = random.randint(1, self.dex + self.bow_skill)
                 elif self.offhand.weapon_com.skill == 'throw':
                     attack_roll = random.randint(1, self.dex + self.throw_skill)                                
-            else: # unarmed
-                attack_roll = random.randint(1, self.dex)    
-        
+                elif self.offhand.weapon_com.skill == 'unarmed':
+                    attack_roll = random.randint(1, self.dex + self.unarmed_skill)  
+
         return attack_roll
 
     def die(self, dungeon):
         import item
         if self in dungeon.current_level.creature_list:
             dungeon.current_level.creature_list.remove(self)
-            corpse = item.Item(name='corpse',
-            x=self.x,
-            y=self.y,
-            sprite=assets.corpse,
-            shadow_sprite=assets.corpse_shade,
-            quantity=1,
-            action_set=['eat', 'throw'])
-            dungeon.current_level.item_list.append(corpse)
-            del self
+            dungeon.current_level.item_list.append(self.corpse)
+            self.corpse.x = self.x
+            self.corpse.y = self.y
+        del self
 
     def run_ai(self, dungeon, fov):
         if self.ai == 'aggro':
@@ -398,12 +410,13 @@ class Entity(object):
         ret_val.append(('VIT: ' + str(self.vit), (255, 255, 255)))     
         ret_val.append(('INT: ' + str(self.int), (255, 255, 255)))
 
-        '''
+        
         if self.mainhand is not None:
             ret_val.append(('mainhand: ' + self.mainhand.name, (255, 255, 255)))
         else:
-            ret_val.append(('mainhand: fist', (255, 255, 255)))
+            ret_val.append(('mainhand: none', (255, 255, 255))) # this should never show
 
+        '''
         if self.offhand is not None:
             ret_val.append(('offhand: ' + self.offhand.name, (255, 255, 255)))
         else:
@@ -438,23 +451,32 @@ class Entity(object):
         
 
     def wield(self, dungeon):
-        for i in dungeon.current_level.item_list:
-            if self.x == i.x and self.y == i.y:
-                dungeon.current_level.item_list.remove(i)
-                self.inv.append(i)
-                return 'picked up ' + i.name
+        from weapon import fist
+        if self.mainhand == fist:
+            for i in self.inv:
+                if i.selected:
+                    i.selected = False
+                    self.mainhand = i
+                    self.inv.remove(i)
+
+                    if len(self.inv) > 0:
+                        self.inv[0].selected = True
+
+                    return 'wielded ' + i.name
 
         return 'no action'
 
     def sheathe(self, dungeon):
-        if len(self.inv) > 0:
-            dropped_item = self.inv.pop()
-            dropped_item.x = self.x
-            dropped_item.y = self.y
-            dungeon.current_level.item_list.append(dropped_item)
-            return 'dropped ' + dropped_item.name
-        else:
-            return 'no action'
+        sheathed_name = self.mainhand.name
+        from weapon import fist
+
+        if self.mainhand != fist:
+            self.inv.append(self.mainhand)
+            self.mainhand = fist
+            return 'sheathed ' + sheathed_name
+        
+        return 'no action'
+        
     
 
     def select(self, direction, text, text_surface, surface, window_width, window_height):
@@ -473,12 +495,12 @@ class Entity(object):
             
             if direction == 'up':# and selected_index > 0:
                 self.inv[selected_index - 1].selected = True
-                print('selected up')
+                #print('selected up')
             elif selected_index == len(self.inv) - 1:
                 self.inv[0].selected = True
             elif direction == 'down':
                 self.inv[selected_index + 1].selected = True
-                print('selected down')
+                #print('selected down')
 
         
             text.out()

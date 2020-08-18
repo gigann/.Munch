@@ -17,6 +17,7 @@ import assets
 import entity
 import item
 import weapon
+import creature
 
 class Cell(object): #each tile of the map
     def __init__(self, seen=False, solid=True, w=0, door=0):
@@ -180,15 +181,11 @@ class Level(object): #each dungeon level
                 while rand_x == room.centerx and rand_y == room.centery:
                     rand_x = random.randint(room.x+1, room.x + room.width-1)
                     rand_y = random.randint(room.y+1, room.y + room.height-1)
-                new_item = item.Item(name='banana',
-                x=random.randint(room.x+1, room.x + room.width-1),
-                y=random.randint(room.y+1, room.y + room.height-1),
-                sprite=assets.banana_tile,
-                shadow_sprite=assets.banana_tile_shade,
-                quantity=1,
-                action_set=['eat', 'throw'])
+                new_item = item.banana()
+                new_item.x = rand_x
+                new_item.y = rand_y
                 self.item_list.append(new_item)
-        
+
         new_weapon = item.Item(name='battle axe', x=self.room_list[0].centerx,  y=self.room_list[0].centery,
         sprite=assets.battleax, shadow_sprite = assets.battleax_shade, quantity=1, action_set=['wield', 'sheathe'],
         weapon_com=weapon.battleax)
@@ -205,9 +202,10 @@ class Level(object): #each dungeon level
                     while rand_x == room.centerx and rand_y == room.centery:
                         rand_x = random.randint(room.x+1, room.x + room.width-1)
                         rand_y = random.randint(room.y+1, room.y + room.height-1)
-                    new_monster = entity.Entity(name='goblin',race='Goblin', x=rand_x, y=rand_y,
-                    vitality=6, strength=4, dexterity=8, intelligence=4, hitdie=4,
-                    ai='aggro',sprite=assets.goblin_tile, shadow_sprite=assets.goblin_tile_shade)
+
+                    new_monster = creature.goblin()
+                    new_monster.x = rand_x
+                    new_monster.y = rand_y
                     self.creature_list.append(new_monster)
 
 
@@ -227,6 +225,9 @@ class Dungeon(object):
         x=self.current_level.room_list[0].centerx,
         y=self.current_level.room_list[0].centery, sprite=assets.player_tile,
         shadow_sprite=assets.player_tile_shade, inv=player_inv)
+
+        self.player.mainhand = weapon.fist
+
         self.entity_set.add(self.player)
 
     def find_fov(self):

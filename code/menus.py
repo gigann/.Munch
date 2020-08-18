@@ -225,12 +225,17 @@ def game_menu(window_width, window_height, framerate, surface):
                 if event.key == pygame.K_PERIOD and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                     player_action = new_dungeon.use_stairs('down')
 
-                if event.key == pygame.K_g: # pick up item
+                if event.key == pygame.K_g or event.key == pygame.K_COMMA: # pick up item
                     player_action = new_dungeon.player.pickup(new_dungeon)
 
                 if event.key == pygame.K_d: # drop item
                     player_action = new_dungeon.player.drop(new_dungeon)
-                    #player_action = new_dungeon.player.drop(new_dungeon)
+  
+                if event.key == pygame.K_w: # wield item
+                    player_action = new_dungeon.player.wield(new_dungeon)
+
+                if event.key == pygame.K_s: # sheathe item
+                    player_action = new_dungeon.player.sheathe(new_dungeon)
 
                 if event.key == pygame.K_UP: # select an item above the currently selected item
                     new_dungeon.player.select('up', player_inv_text, player_inv_surface, surface, window_width, window_height)
