@@ -3,6 +3,8 @@ Issac Gann (gannmann) 2020
 
 entity module handles entity related objects and methods
 """
+import pygame
+pygame.init()
 
 import math
 import numpy as np
@@ -132,8 +134,8 @@ class Entity(object):
                 # potentially attack
                 for creature in dungeon.current_level.creature_list:
                     if self.x + x == creature.x and self.y + y == creature.y:
-                        #return self.attack(creature, dungeon)
-                        return self.weapon_attack(creature, dungeon)
+                        return self.attack(creature, dungeon)
+                        #return self.weapon_attack(creature, dungeon)
                 # if this is reached player hasn't attacked
                 self.x += x
                 self.y += y
@@ -147,8 +149,8 @@ class Entity(object):
                 return 'no action'
         else: # AI MOVEMENT
             if x == dungeon.player.x and y == dungeon.player.y:
-                #return self.attack(dungeon.player, dungeon)
-                return self.weapon_attack(dungeon.player, dungeon)
+                return self.attack(dungeon.player, dungeon)
+                #return self.weapon_attack(dungeon.player, dungeon)
             self.x = x
             self.y = y
             return 'boring'
@@ -343,11 +345,37 @@ class Entity(object):
             if self.x == i.x and self.y == i.y:
                 dungeon.current_level.item_list.remove(i)
                 self.inv.append(i)
+
+                # automatically select it
+                #for x in self.inv:
+                #    x.selected = False
+                #i.selected = True
+
+                if len(self.inv) == 1: # first item
+                    self.inv[0].selected = True
+
                 return 'picked up ' + i.name
 
         return 'no action'
 
     def drop(self, dungeon):
+        for i in self.inv:
+            if i.selected:
+                i.selected = False
+                i.x = self.x
+                i.y = self.y
+                dungeon.current_level.item_list.append(i)
+                self.inv.remove(i)
+
+                if len(self.inv) > 0:
+                    self.inv[0].selected = True
+
+                return 'dropped ' + i.name
+
+        return 'no action'
+
+
+        '''
         if len(self.inv) > 0:
             dropped_item = self.inv.pop()
             dropped_item.x = self.x
@@ -356,7 +384,7 @@ class Entity(object):
             return 'dropped ' + dropped_item.name
         else:
             return 'no action'
-
+        '''
     def get_info(self):
         ret_val = []
         #ret_val.append((str(self.name) + ' the ' + str(self.race), (255, 255, 255)))
@@ -427,3 +455,32 @@ class Entity(object):
             return 'dropped ' + dropped_item.name
         else:
             return 'no action'
+    
+
+    def select(self, direction, text, text_surface, surface, window_width, window_height):
+        selected_index = 0 # default to the first item
+        
+        if len(self.inv) > 0:
+            # get index of currently selected item
+            for i in self.inv:
+                if i.selected:
+                    selected_index = self.inv.index(i)
+
+                    # deselect it
+                    i.selected = False
+
+            # select either the one above or the one below, if possible
+            
+            if direction == 'up':# and selected_index > 0:
+                self.inv[selected_index - 1].selected = True
+                print('selected up')
+            elif selected_index == len(self.inv) - 1:
+                self.inv[0].selected = True
+            elif direction == 'down':
+                self.inv[selected_index + 1].selected = True
+                print('selected down')
+
+        
+            text.out()
+            surface.blit(text_surface, (window_width - window_width//5, window_height//2))
+            pygame.display.update()

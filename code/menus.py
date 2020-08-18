@@ -221,6 +221,7 @@ def game_menu(window_width, window_height, framerate, surface):
 
                 if event.key == pygame.K_COMMA and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                     player_action = new_dungeon.use_stairs('up')
+
                 if event.key == pygame.K_PERIOD and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                     player_action = new_dungeon.use_stairs('down')
 
@@ -229,6 +230,13 @@ def game_menu(window_width, window_height, framerate, surface):
 
                 if event.key == pygame.K_d: # drop item
                     player_action = new_dungeon.player.drop(new_dungeon)
+                    #player_action = new_dungeon.player.drop(new_dungeon)
+
+                if event.key == pygame.K_UP: # select an item above the currently selected item
+                    new_dungeon.player.select('up', player_inv_text, player_inv_surface, surface, window_width, window_height)
+
+                if event.key == pygame.K_DOWN: # select an item below the currently selected item
+                    new_dungeon.player.select('down', player_inv_text, player_inv_surface, surface, window_width, window_height)
 
             if event.type == pygame.USEREVENT: # gui events
                 pass
@@ -267,7 +275,7 @@ def game_menu(window_width, window_height, framerate, surface):
             player_info_text.out()
 
             player_inv_text.out()
-
+            
             game_surface.fill(assets.game_background)
             new_dungeon.render_proper(game_surface)
             blip_player = new_dungeon.render_minimap(map_surface, blip_player)
@@ -302,7 +310,42 @@ def game_menu(window_width, window_height, framerate, surface):
             fps = len(frame_time) / sum(frame_time)
             #print(fps)
 
+'''
+def item_menu(player, surface, action, window_width, window_height): # shows a menu for selecting items to equip/throw/drop etc...
+    menu_open = True
 
+    item_menu_surface = pygame.Surface((window_width//5, window_height//2))
+    action_list = []
+    item_menu_text = message.TextList(item_menu_surface, action_list, assets.body_font)
+
+    for i in player.inv:
+        
+        if action in i.action_set:
+        
+            action_list.append(i)
+
+    while menu_open:
+        for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP: # select an item above the currently selected item
+                        player.select('up')
+                    if event.key == pygame.K_DOWN: # select an item below the currently selected item
+                        player.select('down')
+                    if event.key == pygame.K_KP_ENTER: # use item
+                        return 'action'
+                    if event.key == pygame.K_ESCAPE:
+                        return 'no action'
+
+        
+        item_menu_text.out()
+        surface.blit(item_menu_surface, (0, 0))
+        pygame.display.update()
+        
+
+
+
+    return 'no action'
+'''
 
 def options_menu():
     # add options for the following:

@@ -46,5 +46,10 @@ class TextList(object):
                 text_surface = self.font.render(t[0], True, t[1], bgcolor)
                 self.surface.blit(text_surface, (self.font.get_height(), self.font.get_height()*self.list.index(t)+1))
             else:
-                text_surface = self.font.render(t.name, True, fgcolor, bgcolor)
-                self.surface.blit(text_surface, (self.font.get_height(), self.font.get_height()*self.list.index(t)+1))
+                if t.selected:
+                    text_surface = self.font.render(t.name, True, (0, 0, 0), (255, 255, 0))
+                    self.surface.blit(text_surface, (self.font.get_height(), self.font.get_height()*self.list.index(t)+1))
+                else:
+                    text_surface = self.font.render(t.name, True, fgcolor, bgcolor)
+                    self.surface.blit(text_surface, (self.font.get_height(), self.font.get_height()*self.list.index(t)+1))
+                
