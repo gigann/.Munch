@@ -55,6 +55,19 @@ def from_sheet(spritesheet, x, y, hide=False):
         shadow_hide_tile.fill(hidec, special_flags= pygame.BLEND_RGBA_MULT)
         return (tile, shadow_tile, hide_tile, shadow_hide_tile)
 
+# corpse sprites
+corpse, corpse_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/misc/blood/blood_puddle_red.png')
+
+def get_corpse(sprite, shadow_sprite):
+    new_corpse = corpse.copy()
+    pygame.Surface.blit(new_corpse, sprite, (0, 0))
+    new_corpse = pygame.transform.rotate(new_corpse, 90)
+
+    new_corpse_shade = corpse_shade.copy()
+    pygame.Surface.blit(new_corpse_shade, shadow_sprite, (0, 0))
+    new_corpse_shade = pygame.transform.rotate(new_corpse_shade, 90)
+
+    return new_corpse, new_corpse_shade
 
 #sheet = pygame.image.load('tiles/nethack_tiles_32x32px_by_nevanda.png')
 sheet = pygame.image.load('tiles/rltiles-pack/64x64.png')
@@ -102,9 +115,7 @@ banana_tile, banana_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/
 
 # monster sprites
 goblin_tile, goblin_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/monster/goblin_new.png')
-
-# corpse sprites
-corpse, corpse_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/misc/blood/blood_puddle_red.png')
+goblin_corpse, goblin_corpse_shade = get_corpse(goblin_tile, goblin_tile_shade)
 
 # player sprites
 player_tile, player_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/monster/unique/chuck.png')

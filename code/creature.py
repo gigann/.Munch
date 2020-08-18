@@ -15,7 +15,7 @@ import weapon
 
 def small_corpse():
     corpse = item.Item(name='small corpse', x=0, y=0,
-                         sprite=assets.corpse, shadow_sprite=assets.corpse_shade,
+                         sprite=assets.goblin_corpse, shadow_sprite=assets.goblin_corpse_shade,
                          quantity=1, action_set=['eat', 'throw'],
                          weapon_com=weapon.small_corpse)
     return corpse

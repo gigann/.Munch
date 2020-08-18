@@ -454,6 +454,11 @@ class Dungeon(object):
         (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
         ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
 
+        if self.player.mainhand != weapon.fist:
+            surface.blit(self.player.mainhand.sprite,
+            (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
+            ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
+
     def render(self, surface):
 
         gc.collect()
