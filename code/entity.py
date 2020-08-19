@@ -386,6 +386,25 @@ class Entity(object):
 
         return 'no action'
 
+    def fling(self, dungeon):
+        # get target
+
+        # fling to target
+
+        for i in self.inv:
+            if i.selected:
+                i.selected = False
+                i.x = self.x
+                i.y = self.y
+                dungeon.current_level.item_list.append(i)
+                self.inv.remove(i)
+
+                if len(self.inv) > 0:
+                    self.inv[0].selected = True
+
+                return 'flung ' + i.name
+
+        return 'no action'
 
         '''
         if len(self.inv) > 0:
@@ -477,7 +496,6 @@ class Entity(object):
         
         return 'no action'
         
-    
 
     def select(self, direction, text, text_surface, surface, window_width, window_height):
         selected_index = 0 # default to the first item

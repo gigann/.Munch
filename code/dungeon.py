@@ -186,10 +186,13 @@ class Level(object): #each dungeon level
                 new_item.y = rand_y
                 self.item_list.append(new_item)
 
-        new_weapon = item.Item(name='battle axe', x=self.room_list[0].centerx,  y=self.room_list[0].centery,
-        sprite=assets.battleax, shadow_sprite = assets.battleax_shade, quantity=1, action_set=['wield', 'sheathe'],
-        weapon_com=weapon.battleax)
-        self.item_list.append(new_weapon)
+        #new_weapon = item.Item(name='battle axe', x=self.room_list[0].centerx,  y=self.room_list[0].centery,
+        #sprite=assets.battleax, shadow_sprite = assets.battleax_shade, quantity=1, action_set=['wield', 'sheathe'],
+        #weapon_com=weapon.battleax)
+        #self.item_list.append(new_weapon)
+
+        self.item_list.append(weapon.gen(weapon.battleax, x=self.room_list[0].centerx, y=self.room_list[0].centery))
+
         # traps
 
 

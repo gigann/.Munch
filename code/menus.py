@@ -237,6 +237,9 @@ def game_menu(window_width, window_height, framerate, surface):
                 if event.key == pygame.K_s: # sheathe item
                     player_action = new_dungeon.player.sheathe(new_dungeon)
 
+                if event.key == pygame.K_f: # sheathe item
+                    player_action = new_dungeon.player.fling(new_dungeon)
+
                 if event.key == pygame.K_UP: # select an item above the currently selected item
                     new_dungeon.player.select('up', player_inv_text, player_inv_surface, surface, window_width, window_height)
 
