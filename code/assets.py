@@ -149,17 +149,4 @@ item_color_dark = (204, 204, 0)
 entity_color = (255, 0, 0)
 entity_color_dark = (204, 0, 0)
 
-
-# weapon sprites
-battleax, battleax_shade = from_file(
-    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/broad_axe_1.png')
-tomahawk, tomahawk_shade = from_file(
-    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/war_axe_1.png')
-cleaver, cleaver_shade = from_file(
-    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/hand_axe_2_new.png')
-halberd, halberd_shade = from_file(
-    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/halberd_1.png')
-pollaxe, pollaxe_shade = from_file(
-    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/war_axe_1.png')
-dane_axe, dane_axe_shade = from_file(
-    'tiles/Dungeon Crawl Stone Soup Full/item/weapon/executioner_axe.png')
+target, target_shade = from_sheet(sheet, 6, 10)

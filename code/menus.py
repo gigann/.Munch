@@ -11,7 +11,7 @@ import pygame
 
 import dungeon
 import assets
-#import entity
+import entity
 import message
 
 pygame.init()
@@ -237,7 +237,8 @@ def game_menu(window_width, window_height, framerate, surface):
                 if event.key == pygame.K_s: # sheathe item
                     player_action = new_dungeon.player.sheathe(new_dungeon)
 
-                if event.key == pygame.K_f: # sheathe item
+                if event.key == pygame.K_f: # fling item
+                    target_menu(window_width, window_height, new_dungeon, surface)
                     player_action = new_dungeon.player.fling(new_dungeon)
 
                 if event.key == pygame.K_UP: # select an item above the currently selected item
@@ -354,6 +355,95 @@ def item_menu(player, surface, action, window_width, window_height): # shows a m
 
     return 'no action'
 '''
+
+def target_menu(window_width, window_height, dungeon, surface):
+
+
+    clock = pygame.time.Clock()
+
+    target_surface = pygame.Surface((window_width - window_width//5 , window_height - window_height//5), flags=pygame.SRCALPHA)
+
+    selector = entity.Entity(x=dungeon.player.x, y=dungeon.player.y, sprite=assets.target, shadow_sprite=assets.target_shade)
+
+    x_offset = ((dungeon.player.x - dungeon.player.y) * assets.tile_width//2) - target_surface.get_width()//2 + assets.tile_width//2
+    y_offset = ((dungeon.player.x + dungeon.player.y) * assets.tile_height//4) - target_surface.get_height()//2 + assets.tile_height//4
+
+    target_surface.blit(selector.sprite,
+    (((selector.x - selector.y) * assets.tile_width//2)-x_offset,
+    ((selector.x + selector.y) * assets.tile_height//4)-y_offset))
+    surface.blit(target_surface, (0, 0))
+    pygame.display.update()
+
+    frame_time = []
+    start_time = time.time()
+
+    running = True
+    while running:
+        moved_selector = False
+        #player_action = 'no action'
+
+        # #print('FPS: ' + str(round(clock.get_fps(), 0)) + ', running: ' + str(running) + ', state: ' + str(game_state))        
+        #dT = clock.tick(framerate)/1000.0 # fps    
+        
+        dT = clock.tick()/1000.0 # TESTING MAX FRAMERATE
+
+        # #print('dT : ' + str(dT))
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_KP2:
+                    selector.x += 1
+                    selector.y += 1
+                    moved_selector = True
+                if event.key == pygame.K_KP4:
+                    selector.x -= 1
+                    selector.y += 1
+                    moved_selector = True
+                if event.key == pygame.K_KP6:
+                    selector.x += 1
+                    selector.y -= 1
+                    moved_selector = True
+                if event.key == pygame.K_KP8:
+                    selector.x -= 1
+                    selector.y -= 1
+                    moved_selector = True
+                if event.key == pygame.K_KP1:
+                    selector.y += 1
+                    moved_selector = True
+                if event.key == pygame.K_KP3:
+                    selector.x += 1
+                    moved_selector = True
+                if event.key == pygame.K_KP7:
+                    selector.x -= 1
+                    moved_selector = True
+                if event.key == pygame.K_KP9:
+                    selector.y -= 1
+                    moved_selector = True
+                if event.key == pygame.K_KP_ENTER:
+                    # select target
+                    pass
+                if event.key == pygame.K_ESCAPE:
+                    # quit targeting
+                    pass
+
+        if moved_selector:
+            moved_selector = False
+            target_surface.fill((255, 255, 255, 0), special_flags= pygame.BLEND_RGBA_SUB)
+            target_surface.blit(selector.sprite,
+            (((selector.x - selector.y) * assets.tile_width//2)-x_offset,
+            ((selector.x + selector.y) * assets.tile_height//4)-y_offset))
+            surface.blit(target_surface, (0, 0))
+            pygame.display.update()
+
+
+        end_time = time.time()
+        time_taken = end_time - start_time
+        start_time = end_time
+        frame_time.append(time_taken)
+        frame_time = frame_time[-20:]
+        if sum(frame_time) != 0:
+            fps = len(frame_time) / sum(frame_time)
+            print(fps)
 
 def options_menu():
     # add options for the following:
