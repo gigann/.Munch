@@ -13,16 +13,16 @@ import weapon
 
 # creatures
 
-def small_corpse():
-    corpse = item.Item(name='small corpse', x=0, y=0,
+def small_corpse(x, y):
+    corpse = item.Item(name='small corpse', x=x, y=y,
                          sprite=assets.goblin_corpse, shadow_sprite=assets.goblin_corpse_shade,
                          quantity=1, action_set=['eat', 'throw'],
                          weapon_com=weapon.small_corpse)
     return corpse
 
-def goblin():
-    creature = entity.Entity(name='goblin', race='Goblin', x=0, y=0,
+def goblin(x, y):
+    creature = entity.Entity(name='goblin', race='Goblin', x=x, y=y,
                        vitality=3, strength=2, dexterity=4, intelligence=4, hitdie=4, ai='aggro',
                        sprite=assets.goblin_tile, shadow_sprite=assets.goblin_tile_shade,
-                       corpse=small_corpse())
+                       corpse=small_corpse(x, y), mainhand=weapon.small_weapon(x=x, y=y))
     return creature

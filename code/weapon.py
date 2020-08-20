@@ -2,7 +2,7 @@
 weapon component (for items)
 base weapons
 '''
-import dill
+import random
 
 import assets
 import item
@@ -137,7 +137,11 @@ heavy - ddie size becomes 20
 
 def gen(com, x, y):
     sprite, shadow_sprite = assets.from_file('tiles/weapons/' + com.name + '.png')
+    mainhand_sprite, mainhand_shadow_sprite = assets.from_file('tiles/weapons/' + com.name + '_mainhand.png')
     new_weapon = item.Item(name=com.name.replace('_', ' '), x=x, y=y,
     sprite=sprite, shadow_sprite=shadow_sprite, quantity=1, action_set=['wield', 'sheathe'],
-    weapon_com=com)
+    weapon_com=com, mainhand_sprite=mainhand_sprite, mainhand_shadow_sprite=mainhand_shadow_sprite)
     return new_weapon
+
+def small_weapon(x, y):
+    return gen(random.choice([tomahawk, javelin, dirk, gladius, mace]), x, y)

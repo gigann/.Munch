@@ -251,10 +251,10 @@ class Entity(object):
             damage_roll = 0
             ret_val += (' missed ' + target.name)
             if target.mainhand.weapon_com.riposte:
-                ret_val += (target.name + ' riposte!')
-                if target.attack_roll() >= attack_roll:
+                ret_val += ('. Riposte! ')
+                if target.get_attack_roll() >= attack_roll:
                     new_target = self
-                    target.weapon_attack(new_target)
+                    ret_val += target.weapon_attack(new_target, dungeon)
 
         # subtract from health
         if damage_roll > 0:
@@ -304,11 +304,19 @@ class Entity(object):
 
     def die(self, dungeon):
         import item
+        import weapon
+
         if self in dungeon.current_level.creature_list:
             dungeon.current_level.creature_list.remove(self)
             dungeon.current_level.item_list.append(self.corpse)
             self.corpse.x = self.x
             self.corpse.y = self.y
+
+            if self.mainhand != weapon.fist:
+                dungeon.current_level.item_list.append(self.mainhand)
+                self.mainhand.x = self.x
+                self.mainhand.y = self.y
+
         del self
 
     def run_ai(self, dungeon, fov):

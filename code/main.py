@@ -10,6 +10,7 @@ import pygame
 #import pygame_gui
 
 import menus
+import assets
 
 def main():
     gc.enable()
@@ -25,6 +26,7 @@ def main():
     pygame.display.set_caption('Hominidae') #pygame.display.set_caption('APESHIT')
     master_window = pygame.display.set_mode((window_width, window_height),
     flags=pygame.HWSURFACE | pygame.ASYNCBLIT)
+    pygame.display.set_icon(assets.icon)
 
     pygame.key.set_repeat(250, 50) # set repeating keys
     #clock = pygame.time.Clock()

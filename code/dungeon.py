@@ -20,11 +20,14 @@ import weapon
 import creature
 
 class Cell(object): #each tile of the map
-    def __init__(self, seen=False, solid=True, w=0, door=0):
+    def __init__(self, seen=False,
+                 solid=True, w=0, door=0,
+                 selected=False):
         self.seen = seen
         self.solid = solid
         self.w = w
         self.door = door # 0 = no door, 1 = door type 1, 2 = door type 2
+        self.selected = selected
 
 class Level(object): #each dungeon level
     def __init__(self, width=41, height=21): # 24, 18
@@ -191,7 +194,7 @@ class Level(object): #each dungeon level
         #weapon_com=weapon.battleax)
         #self.item_list.append(new_weapon)
 
-        self.item_list.append(weapon.gen(weapon.battleax, x=self.room_list[0].centerx, y=self.room_list[0].centery))
+        self.item_list.append(weapon.gen(weapon.rapier, x=self.room_list[0].centerx, y=self.room_list[0].centery))
 
         # traps
 
@@ -206,9 +209,7 @@ class Level(object): #each dungeon level
                         rand_x = random.randint(room.x+1, room.x + room.width-1)
                         rand_y = random.randint(room.y+1, room.y + room.height-1)
 
-                    new_monster = creature.goblin()
-                    new_monster.x = rand_x
-                    new_monster.y = rand_y
+                    new_monster = creature.goblin(rand_x, rand_y)
                     self.creature_list.append(new_monster)
 
 
@@ -368,6 +369,7 @@ class Dungeon(object):
                     item_at_tile = self.entity_at_tile(self.current_level.item_list, i, j)
                     creature_at_tile = self.entity_at_tile(self.current_level.creature_list, i, j)
 
+                    '''
                     if feature_at_tile is not None: # 3. tile has feature
                         surface.blit(feature_at_tile.sprite,
                         (((i - j) * assets.tile_width//2)-x_offset,
@@ -382,6 +384,39 @@ class Dungeon(object):
                         surface.blit(creature_at_tile.sprite,
                         (((i - j) * assets.tile_width//2)-(x_offset-16),
                         ((i + j) * assets.tile_height//4)-(y_offset-28)))
+
+                        if creature_at_tile.mainhand != weapon.fist:
+                            surface.blit(creature_at_tile.mainhand.mainhand_sprite,
+                            (((creature_at_tile.x - creature_at_tile.y) * assets.tile_width//2)-(x_offset-16),
+                            ((creature_at_tile.x + creature_at_tile.y) * assets.tile_height//4)-(y_offset-28)))
+                    '''
+                    for feature in self.current_level.feature_list:
+                        if feature.x == i and feature.y == j:
+                            surface.blit(feature.sprite,
+                            (((i - j) * assets.tile_width//2)-x_offset,
+                            ((i + j) * assets.tile_height//4)-y_offset))
+
+                    for items in self.current_level.item_list:
+                        if items.x == i and items.y == j:
+                            surface.blit(items.sprite,
+                            (((i - j) * assets.tile_width//2)-(x_offset-16),
+                            ((i + j) * assets.tile_height//4)-(y_offset-28)))
+
+                    for creature in self.current_level.creature_list:
+                        if creature.x == i and creature.y == j:
+                            surface.blit(creature.sprite,
+                            (((i - j) * assets.tile_width//2)-(x_offset-16),
+                            ((i + j) * assets.tile_height//4)-(y_offset-28)))
+
+                            if creature.mainhand != weapon.fist:
+                                if creature.mainhand.mainhand_sprite != None:
+                                    surface.blit(creature.mainhand.mainhand_sprite,
+                                    (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
+                                    ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
+                                else:
+                                    surface.blit(self.player.mainhand.sprite,
+                                    (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
+                                    ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
 
                 else: # 6. wall / closed door
                     if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
@@ -422,7 +457,7 @@ class Dungeon(object):
                                     surface.blit(assets.open_door_2_stone_shade, # 2c door 2
                                     (((i - j) * assets.tile_width//2)-x_offset,
                                     ((i + j) * assets.tile_height//4)-y_offset))
-
+                    '''
                     feature_at_tile = self.entity_at_tile(self.current_level.feature_list, i, j)
                     item_at_tile = self.entity_at_tile(self.current_level.item_list, i, j)
                     creature_at_tile = self.entity_at_tile(self.current_level.creature_list, i, j)
@@ -442,6 +477,40 @@ class Dungeon(object):
                         (((i - j) * assets.tile_width//2)-(x_offset-16),
                         ((i + j) * assets.tile_height//4)-(y_offset-28)))
 
+                        if creature_at_tile.mainhand != weapon.fist:
+                            surface.blit(creature_at_tile.mainhand.mainhand_shadow_sprite,
+                            (((creature_at_tile.x - creature_at_tile.y) * assets.tile_width//2)-(x_offset-16),
+                            ((creature_at_tile.x + creature_at_tile.y) * assets.tile_height//4)-(y_offset-28)))
+                    '''
+
+                    for feature in self.current_level.feature_list:
+                        if feature.x == i and feature.y == j:
+                            surface.blit(feature.shadow_sprite,
+                            (((i - j) * assets.tile_width//2)-x_offset,
+                            ((i + j) * assets.tile_height//4)-y_offset))
+
+                    for items in self.current_level.item_list:
+                        if items.x == i and items.y == j:
+                            surface.blit(items.shadow_sprite,
+                            (((i - j) * assets.tile_width//2)-(x_offset-16),
+                            ((i + j) * assets.tile_height//4)-(y_offset-28)))
+
+                    for creature in self.current_level.creature_list:
+                        if creature.x == i and creature.y == j:
+                            surface.blit(creature.shadow_sprite,
+                            (((i - j) * assets.tile_width//2)-(x_offset-16),
+                            ((i + j) * assets.tile_height//4)-(y_offset-28)))
+
+                            if creature.mainhand != weapon.fist:
+                                if creature.mainhand.mainhand_shadow_sprite != None:
+                                    surface.blit(creature.mainhand.mainhand_sprite,
+                                    (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
+                                    ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
+                                else:
+                                    surface.blit(self.player.mainhand.shadow_sprite,
+                                    (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
+                                    ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
+
                 else: # 6. wall / closed door
                     if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
                         if ((self.tile_has_entity(i-1, j-1) and self.current_level.cells[i-1][j-1].seen) or
@@ -453,14 +522,25 @@ class Dungeon(object):
                         else: # doesn't visually block an entity
                             self.render_wall(surface, i, j, x_offset, y_offset, shadow=True, hide=False)
             
+            if self.current_level.cells[i][j].selected:
+                surface.blit(assets.target,
+                (((i - j) * assets.tile_width//2)-x_offset,
+                ((i + j) * assets.tile_height//4)-y_offset))
+
+
         surface.blit(self.player.sprite,
         (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
         ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
 
         if self.player.mainhand != weapon.fist:
-            surface.blit(self.player.mainhand.sprite,
-            (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
-            ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
+            if self.player.mainhand.mainhand_sprite != None:
+                surface.blit(self.player.mainhand.mainhand_sprite,
+                (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
+                ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
+            else:
+                surface.blit(self.player.mainhand.sprite,
+                (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
+                ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
 
     def render(self, surface):
 

@@ -16,6 +16,8 @@ framerate = 60
 # INTIALIZE
 master_window = pygame.display.set_mode((window_width, window_height), flags=pygame.HWSURFACE | pygame.ASYNCBLIT)
 
+icon = pygame.image.load('tiles/logo.png')
+
 # ASSET STUFF
 tile_width = 64
 tile_height = 64
@@ -124,7 +126,7 @@ player_tile, player_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/
 FONTS
 '''
 body_font = pygame.font.Font('fonts/Gorilla.ttf', 12)
-
+tiny_font = pygame.font.Font('fonts/Gorilla.ttf', 8)
 
 # colors
 

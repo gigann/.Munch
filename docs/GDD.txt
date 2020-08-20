@@ -238,3 +238,13 @@ black ooze = each attack oils
 red ooze - each attack burns
 blue ooze - each attack soaks
 pink ooze - each attack heals 
+
+TODO OF STUFF 
+give cells a targeting flamingrender it with a target if it is targeted
+makve separate targeting for any tile and los tile
+
+give lore to everything by a storytype of variable that is readable with a menu
+
+give weapon generators that return a random weapon from a certain genre of weapons e.g. small, swords, etc...
+this would be good for spawning monsters with random weapons.
+Have weapons drop from creature on death.
