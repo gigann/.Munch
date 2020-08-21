@@ -2,10 +2,13 @@
 weapon component (for items)
 base weapons
 '''
+import pygame
 import random
 
 import assets
 import item
+
+pygame.init()
 
 #with open('docs/weapon table.csv', newline='') as csvfile:
 #    weapon_reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
@@ -138,9 +141,12 @@ heavy - ddie size becomes 20
 def gen(com, x, y):
     sprite, shadow_sprite = assets.from_file('tiles/weapons/' + com.name + '.png')
     mainhand_sprite, mainhand_shadow_sprite = assets.from_file('tiles/weapons/' + com.name + '_mainhand.png')
+    offhand_sprite = pygame.transform.flip(mainhand_sprite, True, False)
+    offhand_shadow_sprite = pygame.transform.flip(mainhand_shadow_sprite, True, False)
     new_weapon = item.Item(name=com.name.replace('_', ' '), x=x, y=y,
     sprite=sprite, shadow_sprite=shadow_sprite, quantity=1, action_set=['wield', 'sheathe'],
-    weapon_com=com, mainhand_sprite=mainhand_sprite, mainhand_shadow_sprite=mainhand_shadow_sprite)
+    weapon_com=com, mainhand_sprite=mainhand_sprite, mainhand_shadow_sprite=mainhand_shadow_sprite,
+    offhand_sprite=offhand_sprite, offhand_shadow_sprite=offhand_shadow_sprite)
     return new_weapon
 
 def small_weapon(x, y):

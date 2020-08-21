@@ -205,15 +205,15 @@ class Entity(object):
     def weapon_attack(self, target, dungeon, bonus=1): # will replace default attack eventually
         damage_roll = 0
 
-        from weapon import fist
-        if self.mainhand == None:
-            self.mainhand = fist
-        if self.offhand == None:
-            self.offhand = fist
-        if target.mainhand == None:
-            target.mainhand = fist
-        if target.offhand == None:
-            target.offhand = fist
+        #from weapon import fist
+        #if self.mainhand == None:
+        #    self.mainhand = fist
+        #if self.offhand == None:
+        #    self.offhand = fist
+        #if target.mainhand == None:
+        #    target.mainhand = fist
+        #if target.offhand == None:
+        #    target.offhand = fist
 
 
         ret_val = self.name

@@ -426,6 +426,16 @@ class Dungeon(object):
                                     (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
                                     ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
 
+                            if creature.offhand != weapon.fist:
+                                if creature.offhand.offhand_sprite != None:
+                                    surface.blit(creature.offhand.offhand_sprite,
+                                    (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
+                                    ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
+                                else:
+                                    surface.blit(self.player.offhand.sprite,
+                                    (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
+                                    ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
+
                 else: # 6. wall / closed door
                     if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
                         if ((self.tile_has_entity(i-1, j-1) and self.current_level.cells[i-1][j-1].seen) or
@@ -511,13 +521,25 @@ class Dungeon(object):
 
                             if creature.mainhand != weapon.fist:
                                 if creature.mainhand.mainhand_shadow_sprite != None:
-                                    surface.blit(creature.mainhand.mainhand_sprite,
+                                    surface.blit(creature.mainhand.mainhand_shadow_sprite,
                                     (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
                                     ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
                                 else:
                                     surface.blit(self.player.mainhand.shadow_sprite,
                                     (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
                                     ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
+
+                            if creature.offhand != weapon.fist:
+                                if creature.offhand.offhand_shadow_sprite != None:
+                                    surface.blit(creature.offhand.offhand_shadow_sprite,
+                                    (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
+                                    ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
+                                else:
+                                    surface.blit(self.player.offhand.shadow_sprite,
+                                    (((creature.x - creature.y) * assets.tile_width//2)-(x_offset-16),
+                                    ((creature.x + creature.y) * assets.tile_height//4)-(y_offset-28)))
+
+
 
                 else: # 6. wall / closed door
                     if ((i > 0) and (j > 0) and (i+1 < self.current_level.width) and (j+1 < self.current_level.height)): # only check if indexes are in bounds
@@ -549,7 +571,16 @@ class Dungeon(object):
                 surface.blit(self.player.mainhand.sprite,
                 (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
                 ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
-        
+
+        if self.player.offhand != weapon.fist:
+            if self.player.offhand.offhand_sprite != None:
+                surface.blit(self.player.offhand.offhand_sprite,
+                (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
+                ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
+            else:
+                surface.blit(self.player.offhand.sprite,
+                (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
+                ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))        
 
     def render(self, surface):
 

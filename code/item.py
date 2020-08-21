@@ -17,7 +17,9 @@ class Quality(enum.Enum):
 # effects is a list of functions the item is capable of e.g. throw, consume, etc
 class Item(entity.Entity):
     def __init__(self, name, x, y, sprite, shadow_sprite,
-                quantity, action_set, weapon_com = None, armor_com = None, selected = False, mainhand_sprite=None, mainhand_shadow_sprite=None):
+                quantity, action_set, weapon_com = None, armor_com = None, selected = False,
+                mainhand_sprite=None, mainhand_shadow_sprite=None,
+                offhand_sprite=None, offhand_shadow_sprite=None):
         self.name = name
         self.x = x
         self.y = y
@@ -35,6 +37,8 @@ class Item(entity.Entity):
 
         self.mainhand_sprite = mainhand_sprite
         self.mainhand_shadow_sprite = mainhand_shadow_sprite
+        self.offhand_sprite = offhand_sprite
+        self.offhand_shadow_sprite = offhand_shadow_sprite
 
         # components. should probably change item's inheritance from entity to keep it consistent
         self.weapon_com = weapon_com
