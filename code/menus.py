@@ -213,7 +213,7 @@ def game_menu(window_width, window_height, framerate, surface):
                 if event.key == pygame.K_KP9:
                     player_action = new_dungeon.player.move(new_dungeon, 0, -1)
 
-                if event.key ==pygame.K_PERIOD:
+                if event.key == pygame.K_PERIOD:
                     player_action = 'waited...'
 
                 if event.key == pygame.K_c: # toggle door
@@ -245,7 +245,7 @@ def game_menu(window_width, window_height, framerate, surface):
                     if target != None:
                         player_action = new_dungeon.player.fling(new_dungeon, target)
                     else:
-                        return 'no action'
+                        player_action = 'no action'
                 if event.key == pygame.K_UP: # select an item above the currently selected item
                     new_dungeon.player.select('up', player_inv_text, player_inv_surface, surface, window_width, window_height)
 

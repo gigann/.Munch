@@ -119,6 +119,9 @@ banana_tile, banana_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/
 goblin_tile, goblin_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/monster/goblin_new.png')
 goblin_corpse, goblin_corpse_shade = get_corpse(goblin_tile, goblin_tile_shade)
 
+skeleton, skeleton_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/monster/undead/skeletal_warrior_new.png')
+skeleton_corpse, skeleton_corpse_shade = get_corpse(skeleton, skeleton_shade)
+
 # player sprites
 player_tile, player_tile_shade = from_file('tiles/Dungeon Crawl Stone Soup Full/monster/unique/chuck.png')
 

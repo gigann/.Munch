@@ -209,7 +209,7 @@ class Level(object): #each dungeon level
                         rand_x = random.randint(room.x+1, room.x + room.width-1)
                         rand_y = random.randint(room.y+1, room.y + room.height-1)
 
-                    new_monster = creature.goblin(rand_x, rand_y)
+                    new_monster = random.choice([creature.goblin(rand_x, rand_y), creature.skeleton(rand_x, rand_y)])
                     self.creature_list.append(new_monster)
 
 
