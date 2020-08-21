@@ -213,6 +213,13 @@ class Level(object): #each dungeon level
                     self.creature_list.append(new_monster)
 
 
+        # make sure hands are fists if they have nothing in them
+        for c in self.creature_list:
+            if c.mainhand == None:
+                c.mainhand = weapon.fist
+            if c.offhand == None:
+                c.offhand = weapon.fist
+
 class Dungeon(object):
     def __init__(self):
         self.level_list = []
@@ -230,9 +237,10 @@ class Dungeon(object):
         y=self.current_level.room_list[0].centery, sprite=assets.player_tile,
         shadow_sprite=assets.player_tile_shade, inv=player_inv)
 
-        self.player.mainhand = weapon.fist
-
         self.entity_set.add(self.player)
+
+        self.player.mainhand = weapon.fist
+        self.player.offhand = weapon.fist
 
     def find_fov(self):
         trans = np.ndarray((self.current_level.width, self.current_level.height), dtype=np.int8)

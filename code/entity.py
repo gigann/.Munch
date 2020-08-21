@@ -470,14 +470,15 @@ class Entity(object):
         if self.mainhand is not None:
             ret_val.append(('mainhand: ' + self.mainhand.name, (255, 255, 255)))
         else:
-            ret_val.append(('mainhand: none', (255, 255, 255))) # this should never show
+            ret_val.append(('mainhand: none', (255, 255, 255))) # this should never show because fists should be equipped
 
-        '''
+
         if self.offhand is not None:
             ret_val.append(('offhand: ' + self.offhand.name, (255, 255, 255)))
         else:
-            ret_val.append(('offhand: fist', (255, 255, 255)))
+            ret_val.append(('offhand: none', (255, 255, 255))) # this should never show because fists should be equipped
 
+        '''
         if self.helm is not None:
             ret_val.append(('helm: ' + self.helm.name, (255, 255, 255)))
         else:
@@ -505,9 +506,42 @@ class Entity(object):
         '''
         return ret_val
         
+    def don(self, dungeon): # for donning armor
+        pass
+
+    def doff(self, dungeon): # for donning armor
+        pass
 
     def wield(self, dungeon):
+        # If weapon is one handed
+        #     If mainhand slot is empty, equip the weapon there  
+        #     Elif offhand slot is empty, equip the weapon there
+        #     Else slot full
+        # Else weapon is two handed
+        # If mainhand and offhand slots are empty, euqip the weapon there
+        # Else slot full
         from weapon import fist
+
+        for i in self.inv:
+            if i.selected and i.weapon_com: # selected and a weapon
+                if i.weapon_com.hands == 1: # one handed
+                    if self.mainhand == fist: # main hand is empty
+                        i.selected = False
+                        self.mainhand = i
+                        self.inv.remove(i)
+                        if len(self.inv) > 0:
+                            self.inv[0].selected = True
+                        return 'wielded ' + i.name + ' in main hand.'
+                    elif self.offhand == fist:
+                        i.selected = False
+                        self.offhand = i
+                        self.inv.remove(i)
+                        if len(self.inv) > 0:
+                            self.inv[0].selected = True
+                        return 'wielded ' + i.name + ' in off hand.'
+                    else:
+                        return 'no action'
+        '''
         if self.mainhand == fist:
             for i in self.inv:
                 if i.selected:
@@ -519,10 +553,30 @@ class Entity(object):
                         self.inv[0].selected = True
 
                     return 'wielded ' + i.name
-
         return 'no action'
-
+        '''
     def sheathe(self, dungeon):
+        # if weapon in offhand, sheathe it
+        # if weapon in mainhand, sheathe it
+        from weapon import fist
+        
+        if self.offhand != fist:
+            self.inv.append(self.offhand)
+            self.offhand = fist
+
+        elif self.mainhand != fist:
+            self.inv.append(self.mainhand)
+            self.mainhand = fist
+
+        else:
+            return 'no action'
+        
+        if len(self.inv) == 1: # select if only item left
+            self.inv[0].selected = True
+
+            return 'sheathed weapons'
+
+        '''
         sheathed_name = self.mainhand.name
         from weapon import fist
 
@@ -532,6 +586,7 @@ class Entity(object):
             return 'sheathed ' + sheathed_name
         
         return 'no action'
+        '''
         
 
     def select(self, direction, text, text_surface, surface, window_width, window_height):
