@@ -202,7 +202,7 @@ class Entity(object):
 
         return ret_val
         
-    def weapon_attack(self, target, dungeon): # will replace default attack eventually
+    def weapon_attack(self, target, dungeon, bonus=1): # will replace default attack eventually
         damage_roll = 0
 
         from weapon import fist
@@ -231,6 +231,9 @@ class Entity(object):
                 ret_val += (' hit ' + target.name)
             # add STR
             damage_roll += self.str
+
+            # add bonus (from throwing etc)
+            damage_roll *= bonus
 
             # weapon abilities here
             damage_roll -= target.total_armor
@@ -394,23 +397,49 @@ class Entity(object):
 
         return 'no action'
 
-    def fling(self, dungeon):
-        # get target
+    def fling(self, dungeon, target):
+        start_x = self.x
+        start_y = self.y
+        target_x = target[0]
+        target_y = target[1]
 
-        # fling to target
+        cost = np.ndarray((dungeon.current_level.width, dungeon.current_level.height), dtype=np.int8)
+        for i, j in itertools.product(range(dungeon.current_level.width), range(dungeon.current_level.height)):
+            if dungeon.current_level.cells[i][j].solid:
+                cost[i][j] = 0
+            else:
+                cost[i][j] = 1
 
-        for i in self.inv:
-            if i.selected:
-                i.selected = False
-                i.x = self.x
-                i.y = self.y
-                dungeon.current_level.item_list.append(i)
-                self.inv.remove(i)
+        pathfind = tcod.path.AStar(cost, diagonal=1)
+        path = pathfind.get_path(start_x, start_y, target_x, target_y)
 
-                if len(self.inv) > 0:
-                    self.inv[0].selected = True
+        if path: 
+            for i in self.inv:
+                if i.selected:
+                    i.selected = False
+                    i.x = target_x
+                    i.y = target_y
+                    dungeon.current_level.item_list.append(i)
+                    self.inv.remove(i)
 
-                return 'flung ' + i.name
+                    if len(self.inv) > 0:
+                        self.inv[0].selected = True
+
+                    target_creature = dungeon.entity_at_tile(dungeon.current_level.creature_list, target_x, target_y)
+                    if target_creature != None and i.weapon_com != None:
+                        if i.weapon_com.throw:
+                            return self.weapon_attack(target_creature, dungeon, bonus=2)
+                        else:
+                            return self.weapon_attack(target_creature, dungeon)
+                    else:
+                        return 'flung ' + i.name
+
+        else:
+            return 'no action'
+
+
+
+
 
         return 'no action'
 

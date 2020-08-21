@@ -3,7 +3,7 @@ Issac Gann (gannmann) 2020
 
 menus module handles game states between menus e.g. main menu and game menu
 """
-
+import itertools
 import time
 
 import pygame_gui
@@ -149,7 +149,7 @@ def game_menu(window_width, window_height, framerate, surface):
     player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
 
     player_inv_surface = pygame.Surface((window_width//5, window_height//2))
-    player_inv_text = message.TextList(player_inv_surface, new_dungeon.player.inv, assets.body_font)
+    player_inv_text = message.TextList(player_inv_surface, new_dungeon.player.inv, assets.tiny_font)
 
     game_surface = pygame.Surface((window_width - window_width//5 , window_height - window_height//5))
     game_surface.fill(assets.game_background)
@@ -238,12 +238,14 @@ def game_menu(window_width, window_height, framerate, surface):
                     player_action = new_dungeon.player.sheathe(new_dungeon)
 
                 if event.key == pygame.K_f: # fling item
-                    target_menu(new_dungeon, player_inv_text, player_inv_surface,
+                    target = target_menu(new_dungeon, player_inv_text, player_inv_surface,
                                 player_info_surface, player_info_text, game_surface,
-                                map_surface, window_width, window_height,
-                                console_surface, surface)
-                    player_action = new_dungeon.player.fling(new_dungeon)
-
+                                blip_player, map_surface, window_width, window_height,
+                                console, console_surface, surface)
+                    if target != None:
+                        player_action = new_dungeon.player.fling(new_dungeon, target)
+                    else:
+                        return 'no action'
                 if event.key == pygame.K_UP: # select an item above the currently selected item
                     new_dungeon.player.select('up', player_inv_text, player_inv_surface, surface, window_width, window_height)
 
@@ -359,56 +361,142 @@ def item_menu(player, surface, action, window_width, window_height): # shows a m
     return 'no action'
 '''
 
+def auto_target_menu(): # cycles through available targets
+    pass
+
+# returns a selected tile in x, y tuple
 def target_menu(new_dungeon, player_inv_text, player_inv_surface,
                 player_info_surface, player_info_text,
-                game_surface, map_surface, window_width, window_height,
-                console_surface, surface): # either directional or a specific tile
+                game_surface, blip_player, map_surface, window_width, window_height,
+                console, console_surface, surface): # either directional or a specific tile
 
     clock = pygame.time.Clock()
 
+    console.out('Select a target with movement keys. Enter to confirm or ESC to cancel...')
+
+    player_info = new_dungeon.player.get_info()
+    player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
+    player_info_text.out()
+    player_inv_text.out()
+    game_surface.fill(assets.game_background)
+    new_dungeon.render_proper(game_surface)
+    blip_player = new_dungeon.render_minimap(map_surface, blip_player)
+    surface.blit(game_surface, (0, 0))
+    surface.blit(map_surface, (window_width//2, window_height - window_height//5))
+    surface.blit(player_info_surface, (window_width - window_width//5, 16))
+    surface.blit(player_inv_surface, (window_width - window_width//5, window_height//2))
+    surface.blit(console_surface, (0, window_height - window_height//5))
+    pygame.display.update()
 
     #'''
     # accurate FPS
     frame_time = []
     start_time = time.time()
 
+    select_x = new_dungeon.player.x
+    select_y = new_dungeon.player.y
+
+
+
+    fov = new_dungeon.find_fov()
+
     running = True
     while running:
         moved_selector = False
+
+        old_x = select_x
+        old_y = select_y
 
         # #print('FPS: ' + str(round(clock.get_fps(), 0)) + ', running: ' + str(running) + ', state: ' + str(game_state))        
         #dT = clock.tick(framerate)/1000.0 # fps    
         dT = clock.tick()/1000.0 # TESTING MAX FRAMERATE
 
         # #print('dT : ' + str(dT))
-
+        
+        # only select if floor and in line of sight
         for event in pygame.event.get():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_KP2:
-                    moved_selector = new_dungeon.player.move(new_dungeon, 1, 1)
+                    if fov[select_x + 1][select_y + 1] and not new_dungeon.current_level.cells[select_x + 1][select_y + 1].solid:
+                        select_x += 1
+                        select_y += 1
+                        moved_selector = True
                 if event.key == pygame.K_KP4:
-                    moved_selector = new_dungeon.player.move(new_dungeon, -1, 1)
+                    if fov[select_x - 1][select_y + 1] and not new_dungeon.current_level.cells[select_x - 1][select_y + 1].solid:
+                        select_x -= 1
+                        select_y += 1
+                        moved_selector = True
                 if event.key == pygame.K_KP6:
-                    moved_selector = new_dungeon.player.move(new_dungeon, 1, -1)
+                    if fov[select_x + 1][select_y - 1] and not new_dungeon.current_level.cells[select_x + 1][select_y - 1].solid:
+                        select_x += 1
+                        select_y -= 1
+                        moved_selector = True
                 if event.key == pygame.K_KP8:
-                    moved_selector = new_dungeon.player.move(new_dungeon, -1, -1)
+                    if fov[select_x - 1][select_y - 1] and not new_dungeon.current_level.cells[select_x - 1][select_y - 1].solid:
+                        select_x -= 1
+                        select_y -= 1
+                        moved_selector = True
                 if event.key == pygame.K_KP1:
-                    moved_selector = new_dungeon.player.move(new_dungeon, 0, 1)
+                    if fov[select_x][select_y + 1] and not new_dungeon.current_level.cells[select_x][select_y + 1].solid:
+                        select_y += 1
+                        moved_selector = True
                 if event.key == pygame.K_KP3:
-                    moved_selector = new_dungeon.player.move(new_dungeon, 1, 0)
+                    if fov[select_x + 1][select_y] and not new_dungeon.current_level.cells[select_x + 1][select_y].solid:
+                        select_x += 1
+                        moved_selector = True
                 if event.key == pygame.K_KP7:
-                    moved_selector = new_dungeon.player.move(new_dungeon, -1, 0)
+                    if fov[select_x - 1][select_y] and not new_dungeon.current_level.cells[select_x - 1][select_y].solid:
+                        select_x -= 1
+                        moved_selector = True
                 if event.key == pygame.K_KP9:
-                    moved_selector = new_dungeon.player.move(new_dungeon, 0, -1)
+                    if fov[select_x][select_y - 1] and not new_dungeon.current_level.cells[select_x][select_y - 1].solid:
+                        select_y -= 1
+                        moved_selector = True
 
-                if event.key == pygame.K_ESCAPE: # select an item above the currently selected item
-                    running = False
+                if event.key == pygame.K_ESCAPE: # cancel targeting
+                    new_dungeon.current_level.cells[select_x][select_y].selected = False
+                    
+                    player_info = new_dungeon.player.get_info()
+                    player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
+                    player_info_text.out()
+                    player_inv_text.out()
+                    game_surface.fill(assets.game_background)
+                    new_dungeon.render_proper(game_surface)
+                    blip_player = new_dungeon.render_minimap(map_surface, blip_player)
+                    surface.blit(game_surface, (0, 0))
+                    surface.blit(map_surface, (window_width//2, window_height - window_height//5))
+                    surface.blit(player_info_surface, (window_width - window_width//5, 16))
+                    surface.blit(player_inv_surface, (window_width - window_width//5, window_height//2))
+                    surface.blit(console_surface, (0, window_height - window_height//5))
+                    pygame.display.update()
 
-                if event.key == pygame.K_KP_ENTER: # select an item below the currently selected item
-                    new_dungeon.player.select('down', player_inv_text, player_inv_surface, surface, window_width, window_height)
+                    return None
+
+                if event.key == pygame.K_KP_ENTER: # continue with action
+                    new_dungeon.current_level.cells[select_x][select_y].selected = False
+                    
+                    player_info = new_dungeon.player.get_info()
+                    player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
+                    player_info_text.out()
+                    player_inv_text.out()
+                    game_surface.fill(assets.game_background)
+                    new_dungeon.render_proper(game_surface)
+                    blip_player = new_dungeon.render_minimap(map_surface, blip_player)
+                    surface.blit(game_surface, (0, 0))
+                    surface.blit(map_surface, (window_width//2, window_height - window_height//5))
+                    surface.blit(player_info_surface, (window_width - window_width//5, 16))
+                    surface.blit(player_inv_surface, (window_width - window_width//5, window_height//2))
+                    surface.blit(console_surface, (0, window_height - window_height//5))
+                    pygame.display.update()
+
+                    return (select_x, select_y)
 
             if moved_selector:
+                new_dungeon.current_level.cells[old_x][old_y].selected = False
+
+                new_dungeon.current_level.cells[select_x][select_y].selected = True
+
                 # inv list
                 player_info = new_dungeon.player.get_info()
                 player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)

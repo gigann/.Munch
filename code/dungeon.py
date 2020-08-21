@@ -521,7 +521,7 @@ class Dungeon(object):
                             self.render_wall(surface, i, j, x_offset, y_offset, shadow=True, hide=True)
                         else: # doesn't visually block an entity
                             self.render_wall(surface, i, j, x_offset, y_offset, shadow=True, hide=False)
-            
+            # selection sprites
             if self.current_level.cells[i][j].selected:
                 surface.blit(assets.target,
                 (((i - j) * assets.tile_width//2)-x_offset,
@@ -541,6 +541,7 @@ class Dungeon(object):
                 surface.blit(self.player.mainhand.sprite,
                 (((self.player.x - self.player.y) * assets.tile_width//2)-(x_offset-16),
                 ((self.player.x + self.player.y) * assets.tile_height//4)-(y_offset-28)))
+        
 
     def render(self, surface):
 
