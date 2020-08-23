@@ -130,34 +130,37 @@ class Entity(object):
     #        (((self.x - self.y) * assets.tile_width//2),
     #        ((self.x + self.y) * assets.tile_height//4)))
 
-    def move(self, dungeon, x, y):
+    def move(self, dungeon, x, y, console):
         if self.name == dungeon.player.name:
             if self.x +x >= dungeon.current_level.width or self.y +y >= dungeon.current_level.height:
-                return 'no action'
+                return False
             elif not dungeon.current_level.cells[self.x +x][self.y +y].solid:
                 # potentially attack
                 for creature in dungeon.current_level.creature_list:
                     if self.x + x == creature.x and self.y + y == creature.y:
                         #return self.attack(creature, dungeon)
-                        return self.weapon_attack(creature, dungeon)
+                        self.weapon_attack(creature, dungeon, console)
+                        return True
                 # if this is reached player hasn't attacked
                 self.x += x
                 self.y += y
-                return 'boring'
+                return True
             elif dungeon.current_level.cells[self.x +x][self.y +y].door != 0:
                 dungeon.current_level.cells[self.x +x][self.y +y].solid = False
                 self.x += x
                 self.y += y
-                return 'opened door and moved.'
+                #console.out('opened door and moved.')
+                return True
             else:
-                return 'no action'
+                return False
         else: # AI MOVEMENT
             if x == dungeon.player.x and y == dungeon.player.y:
                 #return self.attack(dungeon.player, dungeon)
-                return self.weapon_attack(dungeon.player, dungeon)
+                self.weapon_attack(dungeon.player, dungeon, console)
+                return True
             self.x = x
             self.y = y
-            return 'boring'
+            return True
 
     def attack(self, target, dungeon): # add modifiers for weapon and armor later
         attack_roll = random.randint(1, 20)
@@ -202,8 +205,10 @@ class Entity(object):
 
         return ret_val
         
-    def weapon_attack(self, target, dungeon, bonus=1): # will replace default attack eventually
+    def weapon_attack(self, target, dungeon, console, bonus=1): # will replace default attack eventually
         damage_roll = 0
+
+        console_msg = self.name
 
         #from weapon import fist
         #if self.mainhand == None:
@@ -215,8 +220,6 @@ class Entity(object):
         #if target.offhand == None:
         #    target.offhand = fist
 
-
-        ret_val = self.name
         attack_roll = self.get_attack_roll()
 
         if attack_roll >= random.randint(1, target.dex + target.defense_skill):
@@ -226,9 +229,9 @@ class Entity(object):
             # critical  
             if random.randint(1, self.mainhand.weapon_com.cdie) == self.mainhand.weapon_com.cdie:
                 damage_roll *= self.mainhand.weapon_com.cmult
-                ret_val += (' crit ' + target.name)
+                console_msg += (' crit ' + target.name)
             else: # normal hit
-                ret_val += (' hit ' + target.name)
+                console_msg += (' hit ' + target.name)
             # add STR
             damage_roll += self.str
 
@@ -246,28 +249,28 @@ class Entity(object):
                     shield_roll += target.str
                     if damage_roll - shield_roll < 0:
                         damage_roll = 0
-                        ret_val += (target.name + ' blocked!')
+                        console_msg += (' (' + target.name + ' blocked)')
                     else:
                         damage_roll -= shield_roll
-                        ret_val += (target.name + ' parried ' + shield_roll)
+                        console_msg += (' (' + target.name + ' parried ' + shield_roll + ')')
         else: # miss
             damage_roll = 0
-            ret_val += (' missed ' + target.name)
+            console_msg += (' missed ' + target.name)
             if target.mainhand.weapon_com.riposte:
-                ret_val += ('. Riposte! ')
-                if target.get_attack_roll() >= attack_roll:
-                    new_target = self
-                    ret_val += target.weapon_attack(new_target, dungeon)
+                console.out(console_msg)
+                console.out(target.name + ' ripostes ' + self.name + '!')
+                target.weapon_attack(self, dungeon, console, bonus=0.5)
 
         # subtract from health
         if damage_roll > 0:
             target.current_hp -= damage_roll
-            ret_val += (' for ' + str(damage_roll) + ' damage')
+            console_msg += (' for ' + str(damage_roll) + ' damage.')
+            console.out(console_msg)
 
         if target.current_hp <= 0:
             target.die(dungeon)
+            console.out(target.name + ' is slain!')
 
-        return ret_val
 
     def get_attack_roll(self, hand='mainhand'):
         if hand=='mainhand':
@@ -322,7 +325,7 @@ class Entity(object):
 
         del self
 
-    def run_ai(self, dungeon, fov):
+    def run_ai(self, dungeon, fov, console):
         if self.ai == 'aggro':
             if fov[self.x][self.y]:
 
@@ -343,9 +346,7 @@ class Entity(object):
 
                 if path:
                     path_x, path_y = path[0]
-                    return self.move(dungeon, path_x, path_y)
-
-        return 'boring'
+                    self.move(dungeon, path_x, path_y, console)
 
             
     '''
@@ -363,7 +364,7 @@ class Entity(object):
     def use_stairs(self): # specifically for nonplayer entities
         pass
 
-    def pickup(self, dungeon):
+    def pickup(self, dungeon, console):
         for i in dungeon.current_level.item_list:
             if self.x == i.x and self.y == i.y:
                 dungeon.current_level.item_list.remove(i)
@@ -377,11 +378,12 @@ class Entity(object):
                 if len(self.inv) == 1: # first item
                     self.inv[0].selected = True
 
-                return 'picked up ' + i.name
+                console.out('picked up ' + i.name)
+                return True
 
-        return 'no action'
+        return False
 
-    def drop(self, dungeon):
+    def drop(self, dungeon, console):
         for i in self.inv:
             if i.selected:
                 i.selected = False
@@ -392,12 +394,13 @@ class Entity(object):
 
                 if len(self.inv) > 0:
                     self.inv[0].selected = True
+                
+                console.out('dropped ' + i.name)
+                return True
 
-                return 'dropped ' + i.name
+        return False
 
-        return 'no action'
-
-    def fling(self, dungeon, target):
+    def fling(self, dungeon, target, console):
         start_x = self.x
         start_y = self.y
         target_x = target[0]
@@ -428,14 +431,17 @@ class Entity(object):
                     target_creature = dungeon.entity_at_tile(dungeon.current_level.creature_list, target_x, target_y)
                     if target_creature != None and i.weapon_com != None:
                         if i.weapon_com.throw:
-                            return self.weapon_attack(target_creature, dungeon, bonus=2)
+                            self.weapon_attack(target_creature, dungeon, console, bonus=1)
+                            return True
                         else:
-                            return self.weapon_attack(target_creature, dungeon)
+                            self.weapon_attack(target_creature, dungeon, console, bonus=0.25)
+                            return True
                     else:
-                        return 'flung ' + i.name
+                        console.out('flung ' + i.name)
+                        return True
 
         else:
-            return 'no action'
+            return False
 
 
 
@@ -512,7 +518,7 @@ class Entity(object):
     def doff(self, dungeon): # for donning armor
         pass
 
-    def wield(self, dungeon):
+    def wield(self, dungeon, console):
         # If weapon is one handed
         #     If mainhand slot is empty, equip the weapon there  
         #     Elif offhand slot is empty, equip the weapon there
@@ -531,16 +537,18 @@ class Entity(object):
                         self.inv.remove(i)
                         if len(self.inv) > 0:
                             self.inv[0].selected = True
-                        return 'wielded ' + i.name + ' in main hand.'
+                        console.out('wielded ' + i.name + ' in main hand.')
+                        return True
                     elif self.offhand == fist:
                         i.selected = False
                         self.offhand = i
                         self.inv.remove(i)
                         if len(self.inv) > 0:
                             self.inv[0].selected = True
-                        return 'wielded ' + i.name + ' in off hand.'
+                        console.out('wielded ' + i.name + ' in off hand.')
+                        return True
                     else:
-                        return 'no action'
+                        return False
         '''
         if self.mainhand == fist:
             for i in self.inv:
@@ -555,7 +563,7 @@ class Entity(object):
                     return 'wielded ' + i.name
         return 'no action'
         '''
-    def sheathe(self, dungeon):
+    def sheathe(self, dungeon, console):
         # if weapon in offhand, sheathe it
         # if weapon in mainhand, sheathe it
         from weapon import fist

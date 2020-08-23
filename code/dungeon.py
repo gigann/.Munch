@@ -893,7 +893,7 @@ class Dungeon(object):
                                     (((i - j) * assets.tile_width//2),
                                     ((i + j) * assets.tile_height//4)))
 
-    def toggle_door(self): # must be adjacent to door to toggle it
+    def toggle_door(self, console): # must be adjacent to door to toggle it
         toggled_doors = 0
 
         if self.current_level.cells[self.player.x + 1][self.player.y].door != 0:
@@ -929,11 +929,12 @@ class Dungeon(object):
             toggled_doors += 1
 
         if toggled_doors > 0:
-            return 'toggled door(s)'
+            console.out('toggled doors')
+            return True
         else:
-            return 'no action'
+            return False
 
-    def use_stairs(self, direction):
+    def use_stairs(self, direction, console):
         if direction == 'up':
             for e in self.current_level.feature_list:
                 if e.name == 'up stairs' and self.player.is_on(e):
@@ -941,7 +942,8 @@ class Dungeon(object):
                     self.current_level = self.level_list[self.current_depth]
                     self.player.x = self.current_level.room_list[-1].centerx
                     self.player.y = self.current_level.room_list[-1].centery
-                    return 'ascended the stairs.'
+                    console.out('ascended the stairs.')
+                    return True
         elif direction == 'down':
             for e in self.current_level.feature_list:
                 if e.name == 'down stairs' and self.player.is_on(e):
@@ -949,10 +951,11 @@ class Dungeon(object):
                     self.current_level = self.level_list[self.current_depth]
                     self.player.x = self.current_level.room_list[0].centerx
                     self.player.y = self.current_level.room_list[0].centery
-                    return 'descended the stairs.'
+                    console.out('descended the stairs.')
+                    return True
         else:
-            return 'no action'
-        return 'no action'
+            return False
+        return False
 
     def tile_has_creature(self, x, y):
         for creature in self.current_level.creature_list:

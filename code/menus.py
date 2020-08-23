@@ -99,7 +99,7 @@ def main_menu(window_width, window_height, framerate, surface):
 def game_menu(window_width, window_height, framerate, surface):
     game_state = 'game'
 
-    player_action = 'started'
+    player_action = False
 
     surface.fill((0, 0, 0))
 
@@ -182,7 +182,7 @@ def game_menu(window_width, window_height, framerate, surface):
 
     running = True
     while running:
-        player_action = 'no action'
+        player_action = False
 
         # #print('FPS: ' + str(round(clock.get_fps(), 0)) + ', running: ' + str(running) + ', state: ' + str(game_state))        
         #dT = clock.tick(framerate)/1000.0 # fps    
@@ -197,45 +197,46 @@ def game_menu(window_width, window_height, framerate, surface):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_KP2:
-                    player_action = new_dungeon.player.move(new_dungeon, 1, 1)
+                    player_action = new_dungeon.player.move(new_dungeon, 1, 1, console)
                 if event.key == pygame.K_KP4:
-                    player_action = new_dungeon.player.move(new_dungeon, -1, 1)
+                    player_action = new_dungeon.player.move(new_dungeon, -1, 1, console)
                 if event.key == pygame.K_KP6:
-                    player_action = new_dungeon.player.move(new_dungeon, 1, -1)
+                    player_action = new_dungeon.player.move(new_dungeon, 1, -1, console)
                 if event.key == pygame.K_KP8:
-                    player_action = new_dungeon.player.move(new_dungeon, -1, -1)
+                    player_action = new_dungeon.player.move(new_dungeon, -1, -1, console)
                 if event.key == pygame.K_KP1:
-                    player_action = new_dungeon.player.move(new_dungeon, 0, 1)
+                    player_action = new_dungeon.player.move(new_dungeon, 0, 1, console)
                 if event.key == pygame.K_KP3:
-                    player_action = new_dungeon.player.move(new_dungeon, 1, 0)
+                    player_action = new_dungeon.player.move(new_dungeon, 1, 0, console)
                 if event.key == pygame.K_KP7:
-                    player_action = new_dungeon.player.move(new_dungeon, -1, 0)
+                    player_action = new_dungeon.player.move(new_dungeon, -1, 0, console)
                 if event.key == pygame.K_KP9:
-                    player_action = new_dungeon.player.move(new_dungeon, 0, -1)
+                    player_action = new_dungeon.player.move(new_dungeon, 0, -1, console)
 
-                if event.key == pygame.K_PERIOD:
-                    player_action = 'waited...'
+                if event.key == pygame.K_PERIOD or event.key == pygame.K_KP5:
+                    console.out('waited')
+                    player_action = True
 
                 if event.key == pygame.K_c: # toggle door
-                    player_action = new_dungeon.toggle_door()
+                    player_action = new_dungeon.toggle_door(console)
 
                 if event.key == pygame.K_COMMA and pygame.key.get_mods() & pygame.KMOD_SHIFT:
-                    player_action = new_dungeon.use_stairs('up')
+                    player_action = new_dungeon.use_stairs('up', console)
 
                 if event.key == pygame.K_PERIOD and pygame.key.get_mods() & pygame.KMOD_SHIFT:
-                    player_action = new_dungeon.use_stairs('down')
+                    player_action = new_dungeon.use_stairs('down', console)
 
                 if event.key == pygame.K_g or event.key == pygame.K_COMMA: # pick up item
-                    player_action = new_dungeon.player.pickup(new_dungeon)
+                    player_action = new_dungeon.player.pickup(new_dungeon, console)
 
                 if event.key == pygame.K_d: # drop item
-                    player_action = new_dungeon.player.drop(new_dungeon)
+                    player_action = new_dungeon.player.drop(new_dungeon, console)
   
                 if event.key == pygame.K_w: # wield item
-                    player_action = new_dungeon.player.wield(new_dungeon)
+                    player_action = new_dungeon.player.wield(new_dungeon, console)
 
                 if event.key == pygame.K_s: # sheathe item
-                    player_action = new_dungeon.player.sheathe(new_dungeon)
+                    player_action = new_dungeon.player.sheathe(new_dungeon, console)
 
                 if event.key == pygame.K_f: # fling item
                     target = target_menu(new_dungeon, player_inv_text, player_inv_surface,
@@ -243,9 +244,9 @@ def game_menu(window_width, window_height, framerate, surface):
                                 blip_player, map_surface, window_width, window_height,
                                 console, console_surface, surface)
                     if target != None:
-                        player_action = new_dungeon.player.fling(new_dungeon, target)
+                        player_action = new_dungeon.player.fling(new_dungeon, target, console)
                     else:
-                        player_action = 'no action'
+                        player_action = False
                 if event.key == pygame.K_UP: # select an item above the currently selected item
                     new_dungeon.player.select('up', player_inv_text, player_inv_surface, surface, window_width, window_height)
 
@@ -260,17 +261,13 @@ def game_menu(window_width, window_height, framerate, surface):
             gui.process_events(event)
             '''
 
-        if player_action != 'no action':
+        if player_action:
 
             num_turns += 1
-            if player_action != 'boring':
-                console.out(player_action)
 
             '''MONSTER TURN'''
             for creature in new_dungeon.current_level.creature_list:
-                monster_text = creature.run_ai(new_dungeon, new_dungeon.find_fov())
-                if monster_text != 'boring':
-                    console.out(monster_text)
+                creature.run_ai(new_dungeon, new_dungeon.find_fov(), console)
 
             '''
             console_text_box.kill()
