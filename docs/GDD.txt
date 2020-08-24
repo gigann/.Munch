@@ -249,8 +249,5 @@ give weapon generators that return a random weapon from a certain genre of weapo
 this would be good for spawning monsters with random weapons.
 Have weapons drop from creature on death.
 
-# steps to fix console
-1. remove player action printing
-2. make player action either return true or false
-3. have functions take console as parameter and out from there
+
 

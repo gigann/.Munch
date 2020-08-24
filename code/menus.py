@@ -196,6 +196,9 @@ def game_menu(window_width, window_height, framerate, surface):
                 return(running, game_state)
 
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    new_dungeon.player.current_hp += 100
+
                 if event.key == pygame.K_KP2:
                     player_action = new_dungeon.player.move(new_dungeon, 1, 1, console)
                 if event.key == pygame.K_KP4:
@@ -262,12 +265,14 @@ def game_menu(window_width, window_height, framerate, surface):
             '''
 
         if player_action:
+            new_dungeon.player.process_conditions(new_dungeon, console)
 
             num_turns += 1
 
             '''MONSTER TURN'''
             for creature in new_dungeon.current_level.creature_list:
                 creature.run_ai(new_dungeon, new_dungeon.find_fov(), console)
+                creature.process_conditions(new_dungeon, console)
 
             '''
             console_text_box.kill()

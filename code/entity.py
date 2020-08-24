@@ -23,7 +23,7 @@ class Entity(object):
     ai='simple', sprite=None, shadow_sprite=None, inv=None, corpse=None, helm=None,
     armor=None, boots=None, mainhand=None, offhand=None, ring1=None, ring2=None,
     sword_skill=0, axe_skill=0, spear_skill=0, club_skill=0, unarmed_skill = 0,
-    bow_skill=0, throw_skill=0, defense_skill = 0, total_armor = 0):
+    bow_skill=0, throw_skill=0, defense_skill=0, total_armor=0, immunities=[]):
         self.name = name
         self.race = race
         self.x = x
@@ -77,6 +77,10 @@ class Entity(object):
 
         #self.max_ingredients_known = (math.floor((self.int-10)//2)) * self.level
         self.total_armor = total_armor
+
+        # conditions have a name and a time
+        self.immunities = immunities
+        self.bleeding = False
 
     def determined_attributes(self):
         self.level = math.floor(math.log2(self.exp))+1
@@ -239,7 +243,11 @@ class Entity(object):
             damage_roll *= bonus
 
             # weapon abilities here
-            damage_roll -= target.total_armor
+            if self.mainhand.weapon_com.stab or self.mainhand.weapon_com.slash:
+                if 'bleeding' not in target.immunities:
+                    target.bleeding = True
+            if not self.mainhand.weapon_com.stab and not self.mainhand.weapon_com.strike:
+                damage_roll -= target.total_armor
 
             # target has shield
             if target.offhand.weapon_com.parry:
@@ -624,3 +632,15 @@ class Entity(object):
             text.out()
             surface.blit(text_surface, (window_width - window_width//5, window_height//2))
             pygame.display.update()
+
+    def process_conditions(self, dungeon, console):
+        if self.bleeding:
+            bleed_damage = random.randint(1, 4)
+            self.current_hp -= bleed_damage
+            console.out(self.name + ' bled for ' + str(bleed_damage) + ' damage.')
+            if self.current_hp <= 0:
+                self.die(dungeon)
+
+            stop_bleeding = bool(random.getrandbits(1))
+            if stop_bleeding:
+                self.bleeding = False

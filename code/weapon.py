@@ -53,6 +53,7 @@ class Weapon(object):
             self.pierce = True
             self.daze = True
             self.holy = True
+            
 
         self.enhance_list = enhance_list
 
