@@ -148,6 +148,8 @@ def game_menu(window_width, window_height, framerate, surface):
     player_info = new_dungeon.player.get_info()
     player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
 
+    player_health_bar = message.Bar('Health', new_dungeon.player.current_hp, new_dungeon.player.max_hp)
+
     player_inv_surface = pygame.Surface((window_width//5, window_height//2))
     player_inv_text = message.TextList(player_inv_surface, new_dungeon.player.inv, assets.tiny_font)
 
@@ -160,6 +162,7 @@ def game_menu(window_width, window_height, framerate, surface):
 
     #blits
     player_info_text.out()
+    player_health_bar.update(new_dungeon.player.current_hp, 16, 0, player_info_surface)
 
     new_dungeon.render_proper(game_surface)
     surface.blit(game_surface, (0, 0))
@@ -289,6 +292,7 @@ def game_menu(window_width, window_height, framerate, surface):
             player_info = new_dungeon.player.get_info()
             player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
             player_info_text.out()
+            player_health_bar.update(new_dungeon.player.current_hp, 16, 0, player_info_surface)
 
             player_inv_text.out()
             
@@ -375,10 +379,13 @@ def target_menu(new_dungeon, player_inv_text, player_inv_surface,
     clock = pygame.time.Clock()
 
     console.out('Select a target with movement keys. Enter to confirm or ESC to cancel...')
+    
+    player_health_bar = message.Bar('Health', new_dungeon.player.current_hp, new_dungeon.player.max_hp)
 
     player_info = new_dungeon.player.get_info()
     player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
     player_info_text.out()
+    player_health_bar.update(new_dungeon.player.current_hp, 16, 0, player_info_surface)
     player_inv_text.out()
     game_surface.fill(assets.game_background)
     new_dungeon.render_proper(game_surface)
@@ -462,6 +469,7 @@ def target_menu(new_dungeon, player_inv_text, player_inv_surface,
                     player_info = new_dungeon.player.get_info()
                     player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
                     player_info_text.out()
+                    player_health_bar.update(new_dungeon.player.current_hp, 16, 0, player_info_surface)
                     player_inv_text.out()
                     game_surface.fill(assets.game_background)
                     new_dungeon.render_proper(game_surface)
@@ -481,6 +489,7 @@ def target_menu(new_dungeon, player_inv_text, player_inv_surface,
                     player_info = new_dungeon.player.get_info()
                     player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
                     player_info_text.out()
+                    player_health_bar.update(new_dungeon.player.current_hp, 16, 0, player_info_surface)
                     player_inv_text.out()
                     game_surface.fill(assets.game_background)
                     new_dungeon.render_proper(game_surface)
@@ -503,6 +512,7 @@ def target_menu(new_dungeon, player_inv_text, player_inv_surface,
                 player_info = new_dungeon.player.get_info()
                 player_info_text = message.TextList(player_info_surface, player_info, assets.body_font)
                 player_info_text.out()
+                player_health_bar.update(new_dungeon.player.current_hp, 16, 0, player_info_surface)
 
                 player_inv_text.out()
                 

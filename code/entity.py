@@ -257,7 +257,7 @@ class Entity(object):
                     else:
                         damage_roll -= shield_roll
                         console_msg += (' (' + target.name + ' parried ' + str(shield_roll) + ')')
-                        console.out(console.msg)
+                        console.out(console_msg)
             elif target.mainhand.weapon_com.parry:
                 shield_roll = 0
                 if target.get_attack_roll() >= attack_roll:
@@ -571,8 +571,8 @@ class Entity(object):
     def get_info(self):
         ret_val = []
         #ret_val.append((str(self.name) + ' the ' + str(self.race), (255, 255, 255)))
+        #ret_val.append(('HP: ' + str(self.current_hp) + '/' + str(self.max_hp), (255, 0, 0)))
         ret_val.append(('LVL: ' + str(self.level), (255, 255, 255)))
-        ret_val.append(('HP: ' + str(self.current_hp) + '/' + str(self.max_hp), (255, 0, 0)))
         ret_val.append(('Hunger: ' + str(self.current_hunger) + '/' + str(self.max_hunger), (255, 128, 0)))
         ret_val.append(('Bananas: ' + str(self.bananas), (255, 255, 0)))
 
