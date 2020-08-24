@@ -23,7 +23,7 @@ class Entity(object):
     ai='simple', sprite=None, shadow_sprite=None, inv=None, corpse=None, helm=None,
     armor=None, boots=None, mainhand=None, offhand=None, ring1=None, ring2=None,
     sword_skill=0, axe_skill=0, spear_skill=0, club_skill=0, unarmed_skill = 0,
-    bow_skill=0, throw_skill=0, defense_skill=0, total_armor=0, immunities=[]):
+    bow_skill=0, throw_skill=0, shield_skill=0, defense_skill=0, total_armor=0, immunities=[]):
         self.name = name
         self.race = race
         self.x = x
@@ -59,6 +59,7 @@ class Entity(object):
         self.unarmed_skill = unarmed_skill
         self.bow_skill = bow_skill
         self.throw_skill = throw_skill
+        self.shield_skill = shield_skill
         self.defense_skill = defense_skill
 
         # determined attributes
@@ -214,16 +215,6 @@ class Entity(object):
 
         console_msg = self.name
 
-        #from weapon import fist
-        #if self.mainhand == None:
-        #    self.mainhand = fist
-        #if self.offhand == None:
-        #    self.offhand = fist
-        #if target.mainhand == None:
-        #    target.mainhand = fist
-        #if target.offhand == None:
-        #    target.offhand = fist
-
         attack_roll = self.get_attack_roll()
 
         if attack_roll >= random.randint(1, target.dex + target.defense_skill):
@@ -236,8 +227,11 @@ class Entity(object):
                 console_msg += (' crit ' + target.name)
             else: # normal hit
                 console_msg += (' hit ' + target.name)
-            # add STR
-            damage_roll += self.str
+            # add STR depending on 2 handing, main hand, or off-hand
+            if self.mainhand.weapon_com.hands == 2:
+                damage_roll += self.str
+            else:
+                damage_roll += 1.5 * self.str
 
             # add bonus (from throwing etc)
             damage_roll *= bonus
@@ -251,20 +245,41 @@ class Entity(object):
 
             # target has shield
             if target.offhand.weapon_com.parry:
-                if target.attack_roll(hand='offhand') >= attack_roll:
-                    for dice in target.offhand.weapon_com.ddie_count:
+                shield_roll = 0
+                if target.get_attack_roll(hand='offhand') >= attack_roll:
+                    for dice in range(target.offhand.weapon_com.ddie_count):
                         shield_roll += random.randint(1, target.offhand.weapon_com.ddie_size)
                     shield_roll += target.str
                     if damage_roll - shield_roll < 0:
                         damage_roll = 0
                         console_msg += (' (' + target.name + ' blocked)')
+                        console.out(console_msg)
                     else:
                         damage_roll -= shield_roll
-                        console_msg += (' (' + target.name + ' parried ' + shield_roll + ')')
+                        console_msg += (' (' + target.name + ' parried ' + str(shield_roll) + ')')
+                        console.out(console.msg)
+            elif target.mainhand.weapon_com.parry:
+                shield_roll = 0
+                if target.get_attack_roll() >= attack_roll:
+                    for dice in range(target.mainhand.weapon_com.ddie_count):
+                        shield_roll += random.randint(1, target.mainhand.weapon_com.ddie_size)
+                    shield_roll += target.str
+                    if damage_roll - shield_roll < 0:
+                        damage_roll = 0
+                        console_msg += (' (' + target.name + ' blocked)')
+                        console.out(console_msg)
+                    else:
+                        damage_roll -= shield_roll
+                        console_msg += (' (' + target.name + ' parried ' + str(shield_roll) + ')')
+                        console.out(console_msg)
         else: # miss
             damage_roll = 0
             console_msg += (' missed ' + target.name)
             if target.mainhand.weapon_com.riposte:
+                console.out(console_msg)
+                console.out(target.name + ' ripostes ' + self.name + '!')
+                target.weapon_attack(self, dungeon, console, bonus=0.5)
+            elif target.offhand.weapon_com.riposte:
                 console.out(console_msg)
                 console.out(target.name + ' ripostes ' + self.name + '!')
                 target.weapon_attack(self, dungeon, console, bonus=0.5)
@@ -278,6 +293,88 @@ class Entity(object):
         if target.current_hp <= 0:
             target.die(dungeon)
             console.out(target.name + ' is slain!')
+
+        # check for off-hand
+        if self.mainhand.weapon_com.hands == 1 and self.offhand.weapon_com is not None and target.current_hp > 0:
+            damage_roll = 0
+
+            console_msg = self.name
+
+            attack_roll = self.get_attack_roll(hand='offhand')
+
+            if attack_roll >= random.randint(1, target.dex + target.defense_skill):
+                for dice in range(self.offhand.weapon_com.ddie_count):
+                    damage_roll += random.randint(1, self.offhand.weapon_com.ddie_size)
+
+                # critical
+                if random.randint(1, self.offhand.weapon_com.cdie) == self.offhand.weapon_com.cdie:
+                    damage_roll *= self.offhand.weapon_com.cmult
+                    console_msg += (' crit ' + target.name)
+                else: # normal hit
+                    console_msg += (' hit ' + target.name)
+                # add STR depending on 2 handing, main hand, or off-hand
+                damage_roll += 0.5 * self.str
+
+                # add bonus (from throwing etc)
+                damage_roll *= bonus
+
+                # weapon abilities here
+                if self.offhand.weapon_com.stab or self.offhand.weapon_com.slash:
+                    if 'bleeding' not in target.immunities:
+                        target.bleeding = True
+                if not self.offhand.weapon_com.stab and not self.offhand.weapon_com.strike:
+                    damage_roll -= target.total_armor
+
+            # target has shield
+            if target.offhand.weapon_com.parry:
+                shield_roll = 0
+                if target.get_attack_roll(hand='offhand') >= attack_roll:
+                    for dice in range(target.offhand.weapon_com.ddie_count):
+                        shield_roll += random.randint(1, target.offhand.weapon_com.ddie_size)
+                    shield_roll += target.str
+                    if damage_roll - shield_roll < 0:
+                        damage_roll = 0
+                        console_msg += (' (' + target.name + ' blocked)')
+                        console.out(console_msg)
+                    else:
+                        damage_roll -= shield_roll
+                        console_msg += (' (' + target.name + ' parried ' + str(shield_roll) + ')')
+                        console.out(console_msg)
+            elif target.mainhand.weapon_com.parry:
+                shield_roll = 0
+                if target.get_attack_roll() >= attack_roll:
+                    for dice in range(target.mainhand.weapon_com.ddie_count):
+                        shield_roll += random.randint(1, target.mainhand.weapon_com.ddie_size)
+                    shield_roll += target.str
+                    if damage_roll - shield_roll < 0:
+                        damage_roll = 0
+                        console_msg += (' (' + target.name + ' blocked)')
+                        console.out(console_msg)
+                    else:
+                        damage_roll -= shield_roll
+                        console_msg += (' (' + target.name + ' parried ' + str(shield_roll) + ')')
+                        console.out(console_msg)
+            else: # miss
+                damage_roll = 0
+                console_msg += (' missed ' + target.name)
+                if target.mainhand.weapon_com.riposte:
+                    console.out(console_msg)
+                    console.out(target.name + ' ripostes ' + self.name + '!')
+                    target.weapon_attack(self, dungeon, console, bonus=0.5)
+                elif target.offhand.weapon_com.riposte:
+                    console.out(console_msg)
+                    console.out(target.name + ' ripostes ' + self.name + '!')
+                    target.weapon_attack(self, dungeon, console, bonus=0.5)
+
+            # subtract from health
+            if damage_roll > 0:
+                target.current_hp -= damage_roll
+                console_msg += (' for ' + str(damage_roll) + ' damage.')
+                console.out(console_msg)
+
+            if target.current_hp <= 0:
+                target.die(dungeon)
+                console.out(target.name + ' is slain!')
 
 
     def get_attack_roll(self, hand='mainhand'):
@@ -296,7 +393,9 @@ class Entity(object):
                 elif self.mainhand.weapon_com.skill == 'throw':
                     attack_roll = random.randint(1, self.dex + self.throw_skill)
                 elif self.mainhand.weapon_com.skill == 'unarmed':
-                    attack_roll = random.randint(1, self.dex + self.unarmed_skill)                           
+                    attack_roll = random.randint(1, self.dex + self.unarmed_skill)
+                elif self.mainhand.weapon_com.skill == 'shield':
+                    attack_roll = random.randint(1, self.dex + self.shield_skill)
         else:
             if self.offhand != None:
                 if self.offhand.weapon_com.skill == 'sword':
@@ -312,7 +411,9 @@ class Entity(object):
                 elif self.offhand.weapon_com.skill == 'throw':
                     attack_roll = random.randint(1, self.dex + self.throw_skill)                                
                 elif self.offhand.weapon_com.skill == 'unarmed':
-                    attack_roll = random.randint(1, self.dex + self.unarmed_skill)  
+                    attack_roll = random.randint(1, self.dex + self.unarmed_skill)
+                elif self.offhand.weapon_com.skill == 'shield':
+                    attack_roll = random.randint(1, self.dex + self.shield_skill)
 
         return attack_roll
 

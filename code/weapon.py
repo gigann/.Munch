@@ -153,5 +153,8 @@ def gen(com, x, y):
 def small_weapon(x, y):
     return gen(random.choice([tomahawk, javelin, dirk, gladius, mace]), x, y)
 
+def small_shield(x, y):
+    return gen(random.choice([buckler, roundshield, kiteshield, heatershield]), x, y)
+
 def good_weapon(x, y):
     return gen(random.choice([halberd, pollaxe, spear, pike, partizan, cudgel, flail, morningstar, lucerne]), x, y)

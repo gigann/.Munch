@@ -31,7 +31,7 @@ def goblin(x, y):
     creature = entity.Entity(name='goblin', race='Goblin', x=x, y=y,
                        vitality=3, strength=2, dexterity=4, intelligence=4, hitdie=4, ai='aggro',
                        sprite=assets.goblin_tile, shadow_sprite=assets.goblin_tile_shade,
-                       corpse=small_corpse(x, y), mainhand=weapon.small_weapon(x=x, y=y))
+                       corpse=small_corpse(x, y), mainhand=weapon.small_weapon(x=x, y=y), offhand=weapon.small_shield(x=x, y=y))
     return creature
 
 def skeleton(x, y):

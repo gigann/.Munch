@@ -142,7 +142,7 @@ def game_menu(window_width, window_height, framerate, surface):
     #tile_surface = pygame.Surface((window_width, window_height))
 
     console_surface = pygame.Surface((window_width//2, window_height//5))
-    console = message.Message(console_surface, 5, assets.tiny_font)
+    console = message.Message(console_surface, 5, assets.body_font)
 
     player_info_surface = pygame.Surface((window_width//5, window_height//2))
     player_info = new_dungeon.player.get_info()

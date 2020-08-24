@@ -195,6 +195,7 @@ class Level(object): #each dungeon level
         #self.item_list.append(new_weapon)
 
         self.item_list.append(weapon.gen(weapon.rapier, x=self.room_list[0].centerx, y=self.room_list[0].centery))
+        self.item_list.append(weapon.gen(weapon.kiteshield, x=self.room_list[0].centerx, y=self.room_list[0].centery))
 
         # traps
 
