@@ -547,7 +547,7 @@ class Entity(object):
                             self.inv[0].selected = True
                         console.out('wielded ' + i.name + ' in main hand.')
                         return True
-                    elif self.offhand == fist:
+                    elif self.offhand == fist and self.mainhand.weapon_com.hands == 1:
                         i.selected = False
                         self.offhand = i
                         self.inv.remove(i)
@@ -557,6 +557,18 @@ class Entity(object):
                         return True
                     else:
                         return False
+                else: # two handed
+                    if self.mainhand == fist and self.offhand == fist:
+                        i.selected = False
+                        self.mainhand = i
+                        self.inv.remove(i)
+                        if len(self.inv) > 0:
+                            self.inv[0].selected = True
+                        console.out('wielded ' + i.name + ' with both hands.')
+                        return True
+                    else:
+                        return False
+        
         '''
         if self.mainhand == fist:
             for i in self.inv:
@@ -576,21 +588,28 @@ class Entity(object):
         # if weapon in mainhand, sheathe it
         from weapon import fist
         
-        if self.offhand != fist:
+        if self.mainhand.weapon_com.hands == 2:
+            self.inv.append(self.mainhand)
+            self.mainhand = fist
+            ret_val = True
+            console.out('sheathed two handed weapon.')
+        elif self.offhand != fist:
             self.inv.append(self.offhand)
             self.offhand = fist
-
+            ret_val = True
+            console.out('sheathed off hand weapon.')
         elif self.mainhand != fist:
             self.inv.append(self.mainhand)
             self.mainhand = fist
-
+            ret_val = True
+            console.out('sheathed main hand weapon.')
         else:
-            return 'no action'
+            ret_val = False
         
         if len(self.inv) == 1: # select if only item left
             self.inv[0].selected = True
 
-            return 'sheathed weapons'
+        return ret_val
 
         '''
         sheathed_name = self.mainhand.name
