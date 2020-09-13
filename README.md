@@ -1,5 +1,5 @@
                                       
 
-Ape RL (Pre-Alpha) is a roguelike based on great apes like gorillas, chimps, orangs, etc.
-Currently a work in progress.
+Munch is a roguelike where you play as a great ape searching dungeons for bananas and loot.
+Currently in pre-alpha.
 Uses tcod and pygame, pygame gui, as well as numpy.
